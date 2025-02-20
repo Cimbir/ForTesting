@@ -27,3 +27,11 @@ class UpdatableStore(Protocol[RecordT]):
 class RemovableStore(Protocol):
     def remove(self, unique_id: str) -> None:
         pass
+
+
+class RecordNotFound(Exception):
+    pass
+
+
+class RecordAlreadyExists(Exception):
+    pass
