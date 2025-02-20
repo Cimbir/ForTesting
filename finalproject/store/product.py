@@ -7,7 +7,6 @@ class ProductRow:
     id: str
     name: str
     price: float
-    shop_id: str
     is_removed: bool
 
 
@@ -19,9 +18,6 @@ class ProductStore(Protocol):
         pass
 
     def list_products(self) -> list[str]:
-        pass
-
-    def list_products_by_shop(self, shop_id: str) -> list[str]:
         pass
 
     def update_product(self, product: ProductRow) -> ProductRow:
