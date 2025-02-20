@@ -1,27 +1,38 @@
+import sqlite3
 from dataclasses import dataclass
-from typing import Protocol
+
+from finalproject.store.store import BasicStore, Record, UpdatableStore
 
 
 @dataclass(frozen=True)
-class ProductRow:
+class ProductRecord(Record):
     id: str
     name: str
     price: float
     is_removed: bool
 
 
-class ProductStore(Protocol):
-    def add_product(self, product: ProductRow) -> ProductRow:
-        pass
+# ProductStore interface
+class ProductStore(BasicStore[ProductRecord], UpdatableStore[ProductRecord]):
+    """
+    Add methods unique to ProductStore here
+    """
 
-    def get_product_by_id(self, product_id: str) -> ProductRow:
-        pass
+    pass
 
-    def list_products(self) -> list[str]:
-        pass
 
-    def update_product(self, product: ProductRow) -> ProductRow:
-        pass
+class ProductSQLiteStore:
+    def __init__(self, connection: sqlite3.Connection) -> None:
+        raise NotImplementedError()
 
-    def remove_product(self, product_id: str) -> None:
-        pass
+    def add(self, record: ProductRecord) -> ProductRecord:
+        raise NotImplementedError()
+
+    def get_by_id(self, unique_id: str) -> ProductRecord:
+        raise NotImplementedError()
+
+    def list_all(self) -> list[ProductRecord]:
+        raise NotImplementedError()
+
+    def update(self, record: ProductRecord) -> ProductRecord:
+        raise NotImplementedError()
