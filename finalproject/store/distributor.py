@@ -8,7 +8,10 @@ from finalproject.store.receipt_discount import (
     ReceiptDiscountSQLiteStore,
     ReceiptDiscountStore,
 )
-
+from finalproject.store.product_discount import (
+    ProductDiscountSQLiteStore, 
+    ProductDiscountStore,
+)
 
 class StoreDistributor(Protocol):
     def products(self) -> ProductStore:
@@ -21,6 +24,9 @@ class StoreDistributor(Protocol):
         pass
 
     def receipt_discounts(self) -> ReceiptDiscountStore:
+        pass
+      
+    def product_discount(self) -> ProductDiscountStore:
         pass
 
     def destruct(self) -> None:
@@ -39,6 +45,7 @@ class SQLiteStoreDistributor:
         self._buy_n_get_n = BuyNGetNSQLiteStore(connection)
         self._receipt_discounts = ReceiptDiscountSQLiteStore(connection)
         # Add new stores here
+        self._product_discount = ProductDiscountSQLiteStore(connection)
 
         self._connection = connection
 
@@ -53,6 +60,9 @@ class SQLiteStoreDistributor:
 
     def receipt_discounts(self) -> ReceiptDiscountStore:
         return self._receipt_discounts
+
+    def product_discount(self) -> ProductDiscountStore:
+        return self._product_discount
 
     def destruct(self) -> None:
         self._connection.close()
