@@ -1,11 +1,15 @@
 import sqlite3
 from typing import Protocol
 
+from finalproject.store.combo import ComboSQLiteStore, ComboStore
 from finalproject.store.product import ProductSQLiteStore, ProductStore
 
 
 class StoreDistributor(Protocol):
     def products(self) -> ProductStore:
+        pass
+
+    def combos(self) -> ComboStore:
         pass
 
     def destruct(self) -> None:
@@ -20,12 +24,16 @@ class SQLiteStoreDistributor:
         connection = sqlite3.connect(database=database, check_same_thread=False)
 
         self._products = ProductSQLiteStore(connection)
+        self._combos = ComboSQLiteStore(connection)
         # Add new stores here
 
         self._connection = connection
 
     def products(self) -> ProductStore:
         return self._products
+
+    def combos(self) -> ComboStore:
+        return self._combos
 
     def destruct(self) -> None:
         self._connection.close()
