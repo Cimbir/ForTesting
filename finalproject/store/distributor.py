@@ -1,6 +1,8 @@
 import sqlite3
 from typing import Protocol
 
+
+from finalproject.store.buy_n_get_n import BuyNGetNSQLiteStore, BuyNGetNStore
 from finalproject.store.combo import ComboSQLiteStore, ComboStore
 from finalproject.store.product import ProductSQLiteStore, ProductStore
 
@@ -9,6 +11,9 @@ class StoreDistributor(Protocol):
     def products(self) -> ProductStore:
         pass
 
+    def buy_n_get_n(self) -> BuyNGetNStore:
+        pass
+    
     def combos(self) -> ComboStore:
         pass
 
@@ -26,12 +31,16 @@ class SQLiteStoreDistributor:
         self._products = ProductSQLiteStore(connection)
         self._combos = ComboSQLiteStore(connection)
         # Add new stores here
+        self._buy_n_get_n = BuyNGetNSQLiteStore(connection)
 
         self._connection = connection
 
     def products(self) -> ProductStore:
         return self._products
 
+    def buy_n_get_n(self) -> BuyNGetNStore:
+        return self._buy_n_get_n
+    
     def combos(self) -> ComboStore:
         return self._combos
 
