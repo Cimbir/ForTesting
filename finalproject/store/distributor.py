@@ -5,6 +5,7 @@ from typing import Protocol
 from finalproject.store.buy_n_get_n import BuyNGetNSQLiteStore, BuyNGetNStore
 from finalproject.store.combo import ComboSQLiteStore, ComboStore
 from finalproject.store.product import ProductSQLiteStore, ProductStore
+from finalproject.store.product_discount import ProductDiscountSQLiteStore
 
 
 class StoreDistributor(Protocol):
@@ -15,6 +16,9 @@ class StoreDistributor(Protocol):
         pass
     
     def combos(self) -> ComboStore:
+        pass
+
+    def product_discount(self) -> ProductDiscountSQLiteStore:
         pass
 
     def destruct(self) -> None:
@@ -32,6 +36,7 @@ class SQLiteStoreDistributor:
         self._combos = ComboSQLiteStore(connection)
         # Add new stores here
         self._buy_n_get_n = BuyNGetNSQLiteStore(connection)
+        self._product_discount = ProductDiscountSQLiteStore(connection)
 
         self._connection = connection
 
@@ -43,6 +48,9 @@ class SQLiteStoreDistributor:
     
     def combos(self) -> ComboStore:
         return self._combos
+
+    def product_discount(self) -> ProductDiscountSQLiteStore:
+        return self._product_discount
 
     def destruct(self) -> None:
         self._connection.close()
