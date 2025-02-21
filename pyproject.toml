@@ -1,12 +1,12 @@
-[project]
+[tool.poetry]
 name = "patternsfinalproject"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "dsura22",email = "dsura22@freeuni.edu.ge"},
-    {name = "vvaza22",email = "vvaza22@freeuni.edu.ge"},
-    {name = "ltura22",email = "ltura22@freeuni.edu.ge"},
-    {name = "geban22",email = "geban22@freeuni.edu.ge"}
+    "dsura22@freeuni.edu.ge",
+    "vvaza22@freeuni.edu.ge",
+    "ltura22@freeuni.edu.ge",
+    "geban22@freeuni.edu.ge"
 ]
 readme = "README.md"
 
