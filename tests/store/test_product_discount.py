@@ -2,7 +2,7 @@ import pytest
 
 from finalproject.store.distributor import StoreDistributor
 from finalproject.store.product_discount import ProductDiscountRecord
-from finalproject.store.store import RecordNotFound, RecordAlreadyExists
+from finalproject.store.store import RecordAlreadyExists, RecordNotFound
 
 
 def test_add_and_get_product_discount(distributor: StoreDistributor) -> None:
@@ -16,7 +16,6 @@ def test_add_and_get_product_discount(distributor: StoreDistributor) -> None:
     product_discount_store.add(product_discount)
 
     assert product_discount_store.get_by_id("unique-id-1") == product_discount
-
 
 
 def test_list_all_product_discount(distributor: StoreDistributor) -> None:
@@ -42,6 +41,7 @@ def test_list_all_product_discount(distributor: StoreDistributor) -> None:
     assert product_discount2 in product_discount_store.list_all()
     assert len(product_discount_store.list_all()) == 2
 
+
 def test_remove_product_discount(distributor: StoreDistributor) -> None:
     product_discount_store = distributor.product_discount()
 
@@ -65,6 +65,7 @@ def test_remove_product_discount(distributor: StoreDistributor) -> None:
     assert product_discount2 in product_discount_store.list_all()
     assert len(product_discount_store.list_all()) == 1
 
+
 def test_get_by_product_id_product_discount(distributor: StoreDistributor) -> None:
     product_discount_store = distributor.product_discount()
 
@@ -82,8 +83,12 @@ def test_get_by_product_id_product_discount(distributor: StoreDistributor) -> No
     product_discount_store.add(product_discount1)
     product_discount_store.add(product_discount2)
 
-    assert product_discount_store.get_by_product_id("product-id") == [product_discount1, product_discount2]
+    assert product_discount_store.get_by_product_id("product-id") == [
+        product_discount1,
+        product_discount2,
+    ]
     assert product_discount_store.get_by_product_id("product-id-2") == []
+
 
 def test_add_when_id_already_exists(distributor: StoreDistributor) -> None:
     product_discount_store = distributor.product_discount()
@@ -102,9 +107,11 @@ def test_add_when_id_already_exists(distributor: StoreDistributor) -> None:
     )
     pytest.raises(RecordAlreadyExists, product_discount_store.add, product_discount)
 
+
 def test_get_when_id_does_not_exist(distributor: StoreDistributor) -> None:
     product_discount_store = distributor.product_discount()
     pytest.raises(RecordNotFound, product_discount_store.get_by_id, "unique-id-1")
+
 
 def test_remove_when_id_does_not_exist(distributor: StoreDistributor) -> None:
     product_discount_store = distributor.product_discount()

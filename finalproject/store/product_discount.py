@@ -2,7 +2,13 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Protocol
 
-from finalproject.store.store import Record, BasicStore, RemovableStore, RecordAlreadyExists, RecordNotFound
+from finalproject.store.store import (
+    BasicStore,
+    Record,
+    RecordAlreadyExists,
+    RecordNotFound,
+    RemovableStore,
+)
 
 
 @dataclass(frozen=True)
@@ -11,9 +17,11 @@ class ProductDiscountRecord(Record):
     product_id: str
     discount: float
 
+
 class ProductDiscountStore(BasicStore[ProductDiscountRecord], RemovableStore, Protocol):
     def get_by_product_id(self, product_id: str) -> list[ProductDiscountRecord]:
         pass
+
 
 class ProductDiscountSQLiteStore:
     def __init__(self, connection: sqlite3.Connection) -> None:
@@ -83,7 +91,8 @@ class ProductDiscountSQLiteStore:
                 WHERE id = ?;
                 """,
                 (unique_id,),
-            ).rowcount == 0
+            ).rowcount
+            == 0
         ):
             raise RecordNotFound()
         self._conn.commit()
@@ -98,4 +107,3 @@ class ProductDiscountSQLiteStore:
             (product_id,),
         )
         return [ProductDiscountRecord(*row) for row in cursor.fetchall()]
-
