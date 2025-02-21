@@ -143,14 +143,14 @@ class ComboSQLiteStore:
         return result
 
     def remove(self, unique_id: str) -> None:
-        try:
-            self._conn.execute(
-                """
-                    DELETE FROM combos WHERE id = ?;
-                """,
-                (unique_id,),
-            )
-        except sqlite3.IntegrityError:
+        cursor = self._conn.execute(
+            """
+                DELETE FROM combos WHERE id = ?;
+            """,
+            (unique_id,),
+        )
+
+        if cursor.rowcount == 0:
             raise RecordNotFound()
 
         self._conn.execute(
