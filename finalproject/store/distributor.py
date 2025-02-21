@@ -1,12 +1,17 @@
 import sqlite3
 from typing import Protocol
 
-
 from finalproject.store.buy_n_get_n import BuyNGetNSQLiteStore, BuyNGetNStore
 from finalproject.store.combo import ComboSQLiteStore, ComboStore
 from finalproject.store.product import ProductSQLiteStore, ProductStore
-from finalproject.store.product_discount import ProductDiscountSQLiteStore
-
+from finalproject.store.receipt_discount import (
+    ReceiptDiscountSQLiteStore,
+    ReceiptDiscountStore,
+)
+from finalproject.store.product_discount import (
+    ProductDiscountSQLiteStore, 
+    ProductDiscountStore,
+)
 
 class StoreDistributor(Protocol):
     def products(self) -> ProductStore:
@@ -14,11 +19,14 @@ class StoreDistributor(Protocol):
 
     def buy_n_get_n(self) -> BuyNGetNStore:
         pass
-    
+
     def combos(self) -> ComboStore:
         pass
 
-    def product_discount(self) -> ProductDiscountSQLiteStore:
+    def receipt_discounts(self) -> ReceiptDiscountStore:
+        pass
+      
+    def product_discount(self) -> ProductDiscountStore:
         pass
 
     def destruct(self) -> None:
@@ -34,8 +42,9 @@ class SQLiteStoreDistributor:
 
         self._products = ProductSQLiteStore(connection)
         self._combos = ComboSQLiteStore(connection)
-        # Add new stores here
         self._buy_n_get_n = BuyNGetNSQLiteStore(connection)
+        self._receipt_discounts = ReceiptDiscountSQLiteStore(connection)
+        # Add new stores here
         self._product_discount = ProductDiscountSQLiteStore(connection)
 
         self._connection = connection
@@ -45,11 +54,14 @@ class SQLiteStoreDistributor:
 
     def buy_n_get_n(self) -> BuyNGetNStore:
         return self._buy_n_get_n
-    
+
     def combos(self) -> ComboStore:
         return self._combos
 
-    def product_discount(self) -> ProductDiscountSQLiteStore:
+    def receipt_discounts(self) -> ReceiptDiscountStore:
+        return self._receipt_discounts
+
+    def product_discount(self) -> ProductDiscountStore:
         return self._product_discount
 
     def destruct(self) -> None:
