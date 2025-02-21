@@ -4,13 +4,13 @@ from typing import Protocol
 from finalproject.store.buy_n_get_n import BuyNGetNSQLiteStore, BuyNGetNStore
 from finalproject.store.combo import ComboSQLiteStore, ComboStore
 from finalproject.store.product import ProductSQLiteStore, ProductStore
+from finalproject.store.product_discount import (
+    ProductDiscountSQLiteStore,
+    ProductDiscountStore,
+)
 from finalproject.store.receipt_discount import (
     ReceiptDiscountSQLiteStore,
     ReceiptDiscountStore,
-)
-from finalproject.store.product_discount import (
-    ProductDiscountSQLiteStore, 
-    ProductDiscountStore,
 )
 from finalproject.store.shift import ShiftSQLiteStore, ShiftStore
 
@@ -27,7 +27,7 @@ class StoreDistributor(Protocol):
 
     def receipt_discounts(self) -> ReceiptDiscountStore:
         pass
-      
+
     def product_discount(self) -> ProductDiscountStore:
         pass
 

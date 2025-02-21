@@ -7,7 +7,7 @@ from finalproject.store.store import (
     Record,
     RecordAlreadyExists,
     RecordNotFound,
-    RemovableStore, UpdatableStore,
+    UpdatableStore,
 )
 
 
@@ -17,6 +17,7 @@ class ShiftRecord(Record):
     status: str
     start_time: str
     end_time: str
+
 
 class ShiftStore(BasicStore[ShiftRecord], UpdatableStore[ShiftRecord], Protocol):
     pass
