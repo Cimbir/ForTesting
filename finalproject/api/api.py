@@ -45,7 +45,6 @@ class RunFastAPIUsingUvicorn:
         self._port = port
 
     def run(self, api: FastAPI) -> None:
-        print("Running FastAPI using Uvicorn")
         UvicornServer.from_env().and_port(self._port).run(api)
 
 
