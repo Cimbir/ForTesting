@@ -19,9 +19,13 @@ class ReceiptRecord(Record):
     open: bool
     items: list[ItemRecord]
     paid: float
+    shift_id: str
 
 
 class ReceiptStore(BasicStore[ReceiptRecord], Protocol):
+    def get_by_shift_id(self, shift_id: str) -> list[ReceiptRecord]:
+        pass
+
     def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         pass
 
@@ -44,7 +48,8 @@ class ReceiptSQLiteStore:
             CREATE TABLE IF NOT EXISTS receipts (
                 id TEXT PRIMARY KEY,
                 open BOOLEAN,
-                paid REAL
+                paid REAL,
+                shift_id TEXT
             );
             """
         )
@@ -66,13 +71,14 @@ class ReceiptSQLiteStore:
     def add(self, record: ReceiptRecord) -> ReceiptRecord:
         self._conn.execute(
             """
-                INSERT INTO receipts(id, open, paid)
-                VALUES (?, ?, ?);
+                INSERT INTO receipts(id, open, paid, shift_id)
+                VALUES (?, ?, ?, ?);
             """,
             (
                 record.id,
                 record.open,
                 record.paid,
+                record.shift_id,
             ),
         )
 
@@ -98,7 +104,7 @@ class ReceiptSQLiteStore:
     def get_by_id(self, unique_id: str) -> ReceiptRecord:
         cursor = self._conn.execute(
             """
-            SELECT id, open, paid
+            SELECT id, open, paid, shift_id
             FROM receipts
             WHERE id = ?;
             """,
@@ -122,12 +128,12 @@ class ReceiptSQLiteStore:
         for item in cursor.fetchall():
             items.append(ItemRecord(*item))
 
-        return ReceiptRecord(receipt[0], receipt[1], items, receipt[2])
+        return ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3])
 
     def list_all(self) -> list[ReceiptRecord]:
         cursor = self._conn.execute(
             """
-            SELECT id, open, paid
+            SELECT id, open, paid, shift_id
             FROM receipts;
             """
         )
@@ -147,7 +153,7 @@ class ReceiptSQLiteStore:
             for item in cursor.fetchall():
                 items.append(ItemRecord(*item))
 
-            receipts.append(ReceiptRecord(receipt[0], receipt[1], items, receipt[2]))
+            receipts.append(ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3]))
 
         return receipts
 
@@ -237,3 +243,32 @@ class ReceiptSQLiteStore:
         self._conn.commit()
 
         return None
+
+    def get_by_shift_id(self, shift_id: str) -> list[ReceiptRecord]:
+        cursor = self._conn.execute(
+            """
+            SELECT id, open, paid, shift_id
+            FROM receipts
+            WHERE shift_id = ?;
+            """,
+            (shift_id,),
+        )
+
+        receipts = []
+        for receipt in cursor.fetchall():
+            cursor = self._conn.execute(
+                """
+                SELECT id, product_id, quantity, price
+                FROM items
+                WHERE receipt_id = ?;
+                """,
+                (receipt[0],),
+            )
+
+            items = []
+            for item in cursor.fetchall():
+                items.append(ItemRecord(*item))
+
+            receipts.append(ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3]))
+
+        return receipts
