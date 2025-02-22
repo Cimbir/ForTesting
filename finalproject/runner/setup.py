@@ -5,11 +5,9 @@ from finalproject.api.api import (
 from finalproject.app.app import App, DefaultApp
 from finalproject.store.distributor import SQLiteStoreDistributor
 
-PERSISTENT_DATABASE_PATH = "pos.db"
 
-
-def setup(run_strategy: RunFastAPIStrategy) -> App:
-    store_distributor = SQLiteStoreDistributor(PERSISTENT_DATABASE_PATH)
+def setup(run_strategy: RunFastAPIStrategy, database: str) -> App:
+    store_distributor = SQLiteStoreDistributor(database)
 
     api = APIUsingFastAPI(run_strategy)
 
