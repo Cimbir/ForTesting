@@ -1,14 +1,16 @@
-from fastapi import FastAPI
-
-from finalproject.api.products_api import products_api
+from finalproject.api.api import (
+    APIUsingFastAPI,
+    RunFastAPIStrategy,
+)
+from finalproject.app.app import App, DefaultApp
 from finalproject.store.distributor import SQLiteStoreDistributor
 
+PERSISTENT_DATABASE_PATH = "pos.db"
 
-def setup() -> FastAPI:
-    api = FastAPI()
 
-    api.state.distributor = SQLiteStoreDistributor("pos.db")
+def setup(run_strategy: RunFastAPIStrategy) -> App:
+    store_distributor = SQLiteStoreDistributor(PERSISTENT_DATABASE_PATH)
 
-    api.include_router(products_api, prefix="/products", tags=["Products"])
+    api = APIUsingFastAPI(run_strategy)
 
-    return api
+    return DefaultApp(store_distributor).with_api(api)

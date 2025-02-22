@@ -1,6 +1,7 @@
-from apexdevkit.server import UvicornServer
-
+from finalproject.api.api import RunFastAPIUsingUvicorn
 from finalproject.runner.setup import setup
 
+DEFAULT_PORT = 9000
+
 if __name__ == "__main__":
-    UvicornServer.from_env().run(setup())
+    setup(RunFastAPIUsingUvicorn(port=DEFAULT_PORT)).run_app()
