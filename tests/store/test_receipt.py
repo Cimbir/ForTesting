@@ -1,7 +1,7 @@
 import pytest
 
 from finalproject.store.distributor import StoreDistributor
-from finalproject.store.receipt import ItemRecord, ReceiptRecord
+from finalproject.store.receipt import ReceiptItemRecord, ReceiptRecord
 from finalproject.store.store import RecordNotFound
 
 
@@ -19,8 +19,8 @@ def test_should_add_receipt_with_items(distributor: StoreDistributor) -> None:
             id="1",
             open=True,
             items=[
-                ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
-                ItemRecord(id="2", product_id="2", quantity=2, price=2.0),
+                ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0),
+                ReceiptItemRecord(id="2", product_id="2", quantity=2, price=2.0),
             ],
             paid=0,
             shift_id="1",
@@ -31,8 +31,8 @@ def test_should_add_receipt_with_items(distributor: StoreDistributor) -> None:
         id="1",
         open=True,
         items=[
-            ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
-            ItemRecord(id="2", product_id="2", quantity=2, price=2.0),
+            ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0),
+            ReceiptItemRecord(id="2", product_id="2", quantity=2, price=2.0),
         ],
         paid=0,
         shift_id="1",
@@ -53,8 +53,8 @@ def test_should_get_receipt_with_items(distributor: StoreDistributor) -> None:
             id="1",
             open=True,
             items=[
-                ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
-                ItemRecord(id="2", product_id="2", quantity=2, price=2.0),
+                ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0),
+                ReceiptItemRecord(id="2", product_id="2", quantity=2, price=2.0),
             ],
             paid=0,
             shift_id="1",
@@ -75,8 +75,8 @@ def test_should_get_all_receipts(distributor: StoreDistributor) -> None:
             id="2",
             open=True,
             items=[
-                ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
-                ItemRecord(id="2", product_id="2", quantity=2, price=2.0),
+                ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0),
+                ReceiptItemRecord(id="2", product_id="2", quantity=2, price=2.0),
             ],
             paid=0,
             shift_id="1",
@@ -126,13 +126,13 @@ def test_should_add_item_to_receipt(distributor: StoreDistributor) -> None:
 
     receipt_store.add_item_to_receipt(
         receipt_id="1",
-        item=ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
+        item=ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0),
     )
 
     assert receipt_store.get_by_id("1") == ReceiptRecord(
         id="1",
         open=True,
-        items=[ItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
+        items=[ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
         paid=0,
         shift_id="1",
     )
@@ -149,7 +149,7 @@ def test_should_raise_error_when_adding_item_to_non_existent_receipt(
         RecordNotFound,
         receipt_store.add_item_to_receipt,
         "2",
-        ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
+        ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0),
     )
 
 
@@ -160,7 +160,7 @@ def test_should_update_item_in_receipt(distributor: StoreDistributor) -> None:
         ReceiptRecord(
             id="1",
             open=True,
-            items=[ItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
+            items=[ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
             paid=0,
             shift_id="1",
         )
@@ -168,13 +168,13 @@ def test_should_update_item_in_receipt(distributor: StoreDistributor) -> None:
 
     receipt_store.update_item_in_receipt(
         receipt_id="1",
-        item=ItemRecord(id="1", product_id="1", quantity=2, price=1.0),
+        item=ReceiptItemRecord(id="1", product_id="1", quantity=2, price=1.0),
     )
 
     assert receipt_store.get_by_id("1") == ReceiptRecord(
         id="1",
         open=True,
-        items=[ItemRecord(id="1", product_id="1", quantity=2, price=1.0)],
+        items=[ReceiptItemRecord(id="1", product_id="1", quantity=2, price=1.0)],
         paid=0,
         shift_id="1",
     )
@@ -191,7 +191,7 @@ def test_should_raise_error_when_updating_non_existent_item(
         RecordNotFound,
         receipt_store.update_item_in_receipt,
         receipt.id,
-        ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
+        ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0),
     )
 
 
@@ -202,7 +202,7 @@ def test_should_remove_item_from_receipt(distributor: StoreDistributor) -> None:
         ReceiptRecord(
             id="1",
             open=True,
-            items=[ItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
+            items=[ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
             paid=0,
             shift_id="1",
         )
@@ -239,7 +239,7 @@ def test_should_get_receipts_by_shift_id(distributor: StoreDistributor) -> None:
         ReceiptRecord(
             id="1",
             open=True,
-            items=[ItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
+            items=[ReceiptItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
             paid=0,
             shift_id="1",
         )
@@ -252,7 +252,7 @@ def test_should_get_receipts_by_shift_id(distributor: StoreDistributor) -> None:
         ReceiptRecord(
             id="2",
             open=True,
-            items=[ItemRecord(id="2", product_id="2", quantity=1, price=1.0)],
+            items=[ReceiptItemRecord(id="2", product_id="2", quantity=1, price=1.0)],
             paid=0,
             shift_id="2",
         )

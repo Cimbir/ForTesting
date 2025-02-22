@@ -6,7 +6,7 @@ from finalproject.store.store import BasicStore, Record, RecordNotFound
 
 
 @dataclass(frozen=True)
-class ItemRecord(Record):
+class ReceiptItemRecord(Record):
     id: str
     product_id: str
     quantity: int
@@ -17,7 +17,7 @@ class ItemRecord(Record):
 class ReceiptRecord(Record):
     id: str
     open: bool
-    items: list[ItemRecord]
+    items: list[ReceiptItemRecord]
     paid: float
     shift_id: str
 
@@ -29,10 +29,10 @@ class ReceiptStore(BasicStore[ReceiptRecord], Protocol):
     def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         pass
 
-    def add_item_to_receipt(self, receipt_id: str, item: ItemRecord) -> ItemRecord:
+    def add_item_to_receipt(self, receipt_id: str, item: ReceiptItemRecord) -> ReceiptItemRecord:
         pass
 
-    def update_item_in_receipt(self, receipt_id: str, item: ItemRecord) -> ItemRecord:
+    def update_item_in_receipt(self, receipt_id: str, item: ReceiptItemRecord) -> ReceiptItemRecord:
         pass
 
     def remove_item_from_receipt(self, item_id: str) -> None:
@@ -57,7 +57,7 @@ class ReceiptSQLiteStore:
 
         self._conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS items (
+            CREATE TABLE IF NOT EXISTS receipt_items (
                 id TEXT PRIMARY KEY,
                 receipt_id TEXT,
                 product_id TEXT,
@@ -85,7 +85,7 @@ class ReceiptSQLiteStore:
         for item in record.items:
             self._conn.execute(
                 """
-                    INSERT INTO items(id, receipt_id, product_id, quantity, price)
+                    INSERT INTO receipt_items(id, receipt_id, product_id, quantity, price)
                     VALUES (?, ?, ?, ?, ?);
                 """,
                 (
@@ -118,7 +118,7 @@ class ReceiptSQLiteStore:
         cursor = self._conn.execute(
             """
             SELECT id, product_id, quantity, price
-            FROM items
+            FROM receipt_items
             WHERE receipt_id = ?;
             """,
             (unique_id,),
@@ -126,7 +126,7 @@ class ReceiptSQLiteStore:
 
         items = []
         for item in cursor.fetchall():
-            items.append(ItemRecord(*item))
+            items.append(ReceiptItemRecord(*item))
 
         return ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3])
 
@@ -143,7 +143,7 @@ class ReceiptSQLiteStore:
             cursor = self._conn.execute(
                 """
                 SELECT id, product_id, quantity, price
-                FROM items
+                FROM receipt_items
                 WHERE receipt_id = ?;
                 """,
                 (receipt[0],),
@@ -151,7 +151,7 @@ class ReceiptSQLiteStore:
 
             items = []
             for item in cursor.fetchall():
-                items.append(ItemRecord(*item))
+                items.append(ReceiptItemRecord(*item))
 
             receipts.append(ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3]))
 
@@ -173,7 +173,7 @@ class ReceiptSQLiteStore:
 
         self._conn.commit()
 
-    def add_item_to_receipt(self, receipt_id: str, item: ItemRecord) -> ItemRecord:
+    def add_item_to_receipt(self, receipt_id: str, item: ReceiptItemRecord) -> ReceiptItemRecord:
         if (
             self._conn.execute(
                 """
@@ -189,7 +189,7 @@ class ReceiptSQLiteStore:
 
         self._conn.execute(
             """
-            INSERT INTO items(id, receipt_id, product_id, quantity, price)
+            INSERT INTO receipt_items(id, receipt_id, product_id, quantity, price)
             VALUES (?, ?, ?, ?, ?);
             """,
             (
@@ -204,11 +204,11 @@ class ReceiptSQLiteStore:
 
         return item
 
-    def update_item_in_receipt(self, receipt_id: str, item: ItemRecord) -> ItemRecord:
+    def update_item_in_receipt(self, receipt_id: str, item: ReceiptItemRecord) -> ReceiptItemRecord:
         if (
             self._conn.execute(
                 """
-            UPDATE items
+            UPDATE receipt_items
             SET quantity = ?, price = ?
             WHERE product_id = ? AND receipt_id = ?;
             """,
@@ -231,7 +231,7 @@ class ReceiptSQLiteStore:
         if (
             self._conn.execute(
                 """
-            DELETE FROM items
+            DELETE FROM receipt_items
             WHERE id = ?;
             """,
                 (item_id,),
@@ -259,7 +259,7 @@ class ReceiptSQLiteStore:
             cursor = self._conn.execute(
                 """
                 SELECT id, product_id, quantity, price
-                FROM items
+                FROM receipt_items
                 WHERE receipt_id = ?;
                 """,
                 (receipt[0],),
@@ -267,7 +267,7 @@ class ReceiptSQLiteStore:
 
             items = []
             for item in cursor.fetchall():
-                items.append(ItemRecord(*item))
+                items.append(ReceiptItemRecord(*item))
 
             receipts.append(ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3]))
 
