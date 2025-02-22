@@ -41,7 +41,7 @@ def get_product_response(product: ProductRecord) -> ProductResponse:
 @products_api.get(
     "",
     status_code=200,
-    response_model=ProductResponse,
+    response_model=ListProductsResponse,
 )
 def list_products(
     product_store: ProductStore = Depends(get_product_store),
