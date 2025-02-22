@@ -2,6 +2,7 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Protocol
 
+from finalproject.store.sqlstore import SQLRemovableStore
 from finalproject.store.store import (
     BasicStore,
     Record,
@@ -23,13 +24,14 @@ class ProductDiscountStore(BasicStore[ProductDiscountRecord], RemovableStore, Pr
         pass
 
 
-class ProductDiscountSQLiteStore:
+class ProductDiscountSQLiteStore(SQLRemovableStore[ProductDiscountRecord]):
     def __init__(self, connection: sqlite3.Connection) -> None:
-        self._conn = connection
+        super().__init__(connection, "product_discount")
 
+    def _create_table(self) -> None:
         self._conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS discounts (
+            CREATE TABLE IF NOT EXISTS product_discount (
                 id TEXT PRIMARY KEY,
                 product_id TEXT,
                 discount REAL
@@ -38,72 +40,20 @@ class ProductDiscountSQLiteStore:
         )
         self._conn.commit()
 
-    def add(self, record: ProductDiscountRecord) -> ProductDiscountRecord:
-        try:
-            self._conn.execute(
-                """
-                INSERT INTO discounts(
-                id,
-                product_id,
-                discount)
-                VALUES (?, ?, ?);
-                """,
-                (
-                    record.id,
-                    record.product_id,
-                    record.discount,
-                ),
-            )
-        except sqlite3.IntegrityError:
-            raise RecordAlreadyExists()
+    def _record_to_row(self, record: ProductDiscountRecord) -> tuple:
+        return record.id, record.product_id, record.discount
 
-        self._conn.commit()
-        return record
-
-    def get_by_id(self, unique_id: str) -> ProductDiscountRecord:
-        cursor = self._conn.execute(
-            """
-            SELECT id, product_id, discount
-            FROM discounts
-            WHERE id = ?;
-            """,
-            (unique_id,),
-        )
-        row = cursor.fetchone()
-        if row is None:
-            raise RecordNotFound()
+    def _row_to_record(self, row: tuple) -> ProductDiscountRecord:
         return ProductDiscountRecord(*row)
 
-    def list_all(self) -> list[ProductDiscountRecord]:
-        cursor = self._conn.execute(
-            """
-            SELECT id, product_id, discount
-            FROM discounts;
-            """
-        )
-        return [ProductDiscountRecord(*row) for row in cursor.fetchall()]
-
-    def remove(self, unique_id: str) -> None:
-        if (
-            self._conn.execute(
-                """
-                DELETE FROM discounts
-                WHERE id = ?;
-                """,
-                (unique_id,),
-            ).rowcount
-            == 0
-        ):
-            raise RecordNotFound()
-        self._conn.commit()
-
     def get_by_product_id(self, product_id: str) -> list[ProductDiscountRecord]:
-        cursor = self._conn.execute(
+        cursor = self._conn.cursor()
+        cursor.execute(
             """
-            SELECT id, product_id, discount
-            FROM discounts
+            SELECT * FROM product_discount
             WHERE product_id = ?;
             """,
             (product_id,),
         )
-        return [ProductDiscountRecord(*row) for row in cursor.fetchall()]
+
+        return [self._row_to_record(row) for row in cursor.fetchall()]

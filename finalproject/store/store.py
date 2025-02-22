@@ -18,6 +18,9 @@ class BasicStore(Protocol[RecordT]):
     def list_all(self) -> list[RecordT]:
         pass
 
+    def filter_by_field(self, field: str, value: str) -> list[RecordT]:
+        pass
+
 
 class UpdatableStore(Protocol[RecordT]):
     def update(self, record: RecordT) -> RecordT:

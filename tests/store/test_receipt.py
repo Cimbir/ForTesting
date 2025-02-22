@@ -1,7 +1,6 @@
 import pytest
 
 from finalproject.store.distributor import StoreDistributor
-from finalproject.store.receipt import ReceiptItemRecord, ReceiptRecord
 from finalproject.store.store import RecordNotFound
 
 

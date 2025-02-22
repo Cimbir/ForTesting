@@ -3,16 +3,18 @@ from typing import Protocol
 
 from finalproject.store.buy_n_get_n import BuyNGetNSQLiteStore, BuyNGetNStore
 from finalproject.store.combo import ComboSQLiteStore, ComboStore
+from finalproject.store.combo_item import ComboItemStore, ComboItemSQLiteStore
 from finalproject.store.product import ProductSQLiteStore, ProductStore
 from finalproject.store.product_discount import (
     ProductDiscountSQLiteStore,
     ProductDiscountStore,
 )
-from finalproject.store.receipt import ReceiptSQLiteStore, ReceiptStore
+from finalproject.store.receipt import ReceiptStore, ReceiptSQLiteStore
 from finalproject.store.receipt_discount import (
     ReceiptDiscountSQLiteStore,
     ReceiptDiscountStore,
 )
+from finalproject.store.receipt_items import ReceiptItemStore, ReceiptItemSQLiteStore
 from finalproject.store.shift import ShiftSQLiteStore, ShiftStore
 
 
@@ -26,7 +28,13 @@ class StoreDistributor(Protocol):
     def combos(self) -> ComboStore:
         pass
 
+    def combo_items(self) -> ComboItemStore:
+        pass
+
     def receipt(self) -> ReceiptStore:
+        pass
+
+    def receipt_items(self) -> ReceiptItemStore:
         pass
 
     def receipt_discounts(self) -> ReceiptDiscountStore:
@@ -51,8 +59,10 @@ class SQLiteStoreDistributor:
 
         self._products = ProductSQLiteStore(connection)
         self._combos = ComboSQLiteStore(connection)
+        self._combo_items = ComboItemSQLiteStore(connection)
         self._buy_n_get_n = BuyNGetNSQLiteStore(connection)
         self._receipt = ReceiptSQLiteStore(connection)
+        self._receipt_items = ReceiptItemSQLiteStore(connection)
         self._receipt_discounts = ReceiptDiscountSQLiteStore(connection)
         self._product_discount = ProductDiscountSQLiteStore(connection)
         self._shifts = ShiftSQLiteStore(connection)
@@ -70,8 +80,14 @@ class SQLiteStoreDistributor:
     def combos(self) -> ComboStore:
         return self._combos
 
+    def combo_items(self) -> ComboItemStore:
+        return self._combo_items
+
     def receipt(self) -> ReceiptStore:
         return self._receipt
+
+    def receipt_items(self) -> ReceiptItemStore:
+        return self._receipt_items
 
     def receipt_discounts(self) -> ReceiptDiscountStore:
         return self._receipt_discounts
