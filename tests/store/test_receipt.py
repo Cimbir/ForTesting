@@ -69,7 +69,9 @@ def test_should_get_all_receipts(distributor: StoreDistributor) -> None:
 
     assert len(receipt_store.list_all()) == 0
 
-    receipt_1 = receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+    receipt_1 = receipt_store.add(
+        ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1")
+    )
     receipt_2 = receipt_store.add(
         ReceiptRecord(
             id="2",
@@ -185,7 +187,9 @@ def test_should_raise_error_when_updating_non_existent_item(
 ) -> None:
     receipt_store = distributor.receipt()
 
-    receipt = receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+    receipt = receipt_store.add(
+        ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1")
+    )
 
     pytest.raises(
         RecordNotFound,
@@ -231,6 +235,7 @@ def test_should_raise_error_when_removing_non_existent_item(
         receipt_store.remove_item_from_receipt,
         "1",
     )
+
 
 def test_should_get_receipts_by_shift_id(distributor: StoreDistributor) -> None:
     receipt_store = distributor.receipt()

@@ -29,10 +29,14 @@ class ReceiptStore(BasicStore[ReceiptRecord], Protocol):
     def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         pass
 
-    def add_item_to_receipt(self, receipt_id: str, item: ReceiptItemRecord) -> ReceiptItemRecord:
+    def add_item_to_receipt(
+        self, receipt_id: str, item: ReceiptItemRecord
+    ) -> ReceiptItemRecord:
         pass
 
-    def update_item_in_receipt(self, receipt_id: str, item: ReceiptItemRecord) -> ReceiptItemRecord:
+    def update_item_in_receipt(
+        self, receipt_id: str, item: ReceiptItemRecord
+    ) -> ReceiptItemRecord:
         pass
 
     def remove_item_from_receipt(self, item_id: str) -> None:
@@ -85,7 +89,12 @@ class ReceiptSQLiteStore:
         for item in record.items:
             self._conn.execute(
                 """
-                    INSERT INTO receipt_items(id, receipt_id, product_id, quantity, price)
+                    INSERT INTO receipt_items(
+                    id, 
+                    receipt_id, 
+                    product_id, 
+                    quantity, 
+                    price)
                     VALUES (?, ?, ?, ?, ?);
                 """,
                 (
@@ -153,7 +162,9 @@ class ReceiptSQLiteStore:
             for item in cursor.fetchall():
                 items.append(ReceiptItemRecord(*item))
 
-            receipts.append(ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3]))
+            receipts.append(
+                ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3])
+            )
 
         return receipts
 
@@ -173,7 +184,9 @@ class ReceiptSQLiteStore:
 
         self._conn.commit()
 
-    def add_item_to_receipt(self, receipt_id: str, item: ReceiptItemRecord) -> ReceiptItemRecord:
+    def add_item_to_receipt(
+        self, receipt_id: str, item: ReceiptItemRecord
+    ) -> ReceiptItemRecord:
         if (
             self._conn.execute(
                 """
@@ -204,7 +217,9 @@ class ReceiptSQLiteStore:
 
         return item
 
-    def update_item_in_receipt(self, receipt_id: str, item: ReceiptItemRecord) -> ReceiptItemRecord:
+    def update_item_in_receipt(
+        self, receipt_id: str, item: ReceiptItemRecord
+    ) -> ReceiptItemRecord:
         if (
             self._conn.execute(
                 """
@@ -269,6 +284,8 @@ class ReceiptSQLiteStore:
             for item in cursor.fetchall():
                 items.append(ReceiptItemRecord(*item))
 
-            receipts.append(ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3]))
+            receipts.append(
+                ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3])
+            )
 
         return receipts
