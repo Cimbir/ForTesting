@@ -6,9 +6,11 @@ from finalproject.store.store import RecordNotFound
 
 
 def test_should_add_empty_receipt(distributor: StoreDistributor) -> None:
-    receipt = distributor.receipt().add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt = distributor.receipt().add(
+        ReceiptRecord(id="1", open=True, items=[], paid=0)
+    )
 
-    assert receipt == ReceiptRecord(id="1", open=True, items=[])
+    assert receipt == ReceiptRecord(id="1", open=True, items=[], paid=0)
 
 
 def test_should_add_receipt_with_items(distributor: StoreDistributor) -> None:
@@ -20,6 +22,7 @@ def test_should_add_receipt_with_items(distributor: StoreDistributor) -> None:
                 ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
                 ItemRecord(id="2", product_id="2", quantity=2, price=2.0),
             ],
+            paid=0,
         )
     )
 
@@ -30,11 +33,14 @@ def test_should_add_receipt_with_items(distributor: StoreDistributor) -> None:
             ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
             ItemRecord(id="2", product_id="2", quantity=2, price=2.0),
         ],
+        paid=0,
     )
 
 
 def test_should_get_empty_receipt(distributor: StoreDistributor) -> None:
-    receipt = distributor.receipt().add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt = distributor.receipt().add(
+        ReceiptRecord(id="1", open=True, items=[], paid=0)
+    )
 
     assert distributor.receipt().get_by_id("1") == receipt
 
@@ -48,6 +54,7 @@ def test_should_get_receipt_with_items(distributor: StoreDistributor) -> None:
                 ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
                 ItemRecord(id="2", product_id="2", quantity=2, price=2.0),
             ],
+            paid=0,
         )
     )
 
@@ -59,7 +66,7 @@ def test_should_get_all_receipts(distributor: StoreDistributor) -> None:
 
     assert len(receipt_store.list_all()) == 0
 
-    receipt_1 = receipt_store.add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt_1 = receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0))
     receipt_2 = receipt_store.add(
         ReceiptRecord(
             id="2",
@@ -68,11 +75,9 @@ def test_should_get_all_receipts(distributor: StoreDistributor) -> None:
                 ItemRecord(id="1", product_id="1", quantity=1, price=1.0),
                 ItemRecord(id="2", product_id="2", quantity=2, price=2.0),
             ],
+            paid=0,
         )
     )
-
-    receipt_store.add(receipt_1)
-    receipt_store.add(receipt_2)
 
     assert len(receipt_store.list_all()) == 2
     assert receipt_1 in receipt_store.list_all()
@@ -84,7 +89,7 @@ def test_should_raise_error_when_getting_non_existent_receipt(
 ) -> None:
     receipt_store = distributor.receipt()
 
-    receipt_store.add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0))
 
     pytest.raises(RecordNotFound, receipt_store.get_by_id, "2")
 
@@ -92,11 +97,12 @@ def test_should_raise_error_when_getting_non_existent_receipt(
 def test_should_close_receipt(distributor: StoreDistributor) -> None:
     receipt_store = distributor.receipt()
 
-    receipt_store.add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0))
 
-    receipt_store.close_receipt_by_id("1")
+    receipt_store.close_receipt_by_id("1", 10)
 
     assert not receipt_store.get_by_id("1").open
+    assert receipt_store.get_by_id("1").paid == 10
 
 
 def test_should_raise_error_on_closing_non_existent_receipt(
@@ -104,15 +110,15 @@ def test_should_raise_error_on_closing_non_existent_receipt(
 ) -> None:
     receipt_store = distributor.receipt()
 
-    receipt_store.add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0))
 
-    pytest.raises(RecordNotFound, receipt_store.close_receipt_by_id, "2")
+    pytest.raises(RecordNotFound, receipt_store.close_receipt_by_id, "2", 10)
 
 
 def test_should_add_item_to_receipt(distributor: StoreDistributor) -> None:
     receipt_store = distributor.receipt()
 
-    receipt_store.add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0))
 
     receipt_store.add_item_to_receipt(
         receipt_id="1",
@@ -123,6 +129,7 @@ def test_should_add_item_to_receipt(distributor: StoreDistributor) -> None:
         id="1",
         open=True,
         items=[ItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
+        paid=0,
     )
 
 
@@ -131,7 +138,7 @@ def test_should_raise_error_when_adding_item_to_non_existent_receipt(
 ) -> None:
     receipt_store = distributor.receipt()
 
-    receipt_store.add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0))
 
     pytest.raises(
         RecordNotFound,
@@ -149,6 +156,7 @@ def test_should_update_item_in_receipt(distributor: StoreDistributor) -> None:
             id="1",
             open=True,
             items=[ItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
+            paid=0,
         )
     )
 
@@ -161,6 +169,7 @@ def test_should_update_item_in_receipt(distributor: StoreDistributor) -> None:
         id="1",
         open=True,
         items=[ItemRecord(id="1", product_id="1", quantity=2, price=1.0)],
+        paid=0,
     )
 
 
@@ -169,7 +178,7 @@ def test_should_raise_error_when_updating_non_existent_item(
 ) -> None:
     receipt_store = distributor.receipt()
 
-    receipt = receipt_store.add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt = receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0))
 
     pytest.raises(
         RecordNotFound,
@@ -187,6 +196,7 @@ def test_should_remove_item_from_receipt(distributor: StoreDistributor) -> None:
             id="1",
             open=True,
             items=[ItemRecord(id="1", product_id="1", quantity=1, price=1.0)],
+            paid=0,
         )
     )
 
@@ -196,6 +206,7 @@ def test_should_remove_item_from_receipt(distributor: StoreDistributor) -> None:
         id="1",
         open=True,
         items=[],
+        paid=0,
     )
 
 
@@ -204,7 +215,7 @@ def test_should_raise_error_when_removing_non_existent_item(
 ) -> None:
     receipt_store = distributor.receipt()
 
-    receipt_store.add(ReceiptRecord(id="1", open=True, items=[]))
+    receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0))
 
     pytest.raises(
         RecordNotFound,

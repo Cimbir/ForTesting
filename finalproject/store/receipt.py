@@ -18,10 +18,11 @@ class ReceiptRecord(Record):
     id: str
     open: bool
     items: list[ItemRecord]
+    paid: float
 
 
 class ReceiptStore(BasicStore[ReceiptRecord], Protocol):
-    def close_receipt_by_id(self, unique_id: str) -> None:
+    def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         pass
 
     def add_item_to_receipt(self, receipt_id: str, item: ItemRecord) -> ItemRecord:
@@ -42,7 +43,8 @@ class ReceiptSQLiteStore:
             """
             CREATE TABLE IF NOT EXISTS receipts (
                 id TEXT PRIMARY KEY,
-                open BOOLEAN
+                open BOOLEAN,
+                paid REAL
             );
             """
         )
@@ -64,12 +66,13 @@ class ReceiptSQLiteStore:
     def add(self, record: ReceiptRecord) -> ReceiptRecord:
         self._conn.execute(
             """
-                INSERT INTO receipts(id, open)
-                VALUES (?, ?);
+                INSERT INTO receipts(id, open, paid)
+                VALUES (?, ?, ?);
             """,
             (
                 record.id,
                 record.open,
+                record.paid,
             ),
         )
 
@@ -95,7 +98,7 @@ class ReceiptSQLiteStore:
     def get_by_id(self, unique_id: str) -> ReceiptRecord:
         cursor = self._conn.execute(
             """
-            SELECT id, open
+            SELECT id, open, paid
             FROM receipts
             WHERE id = ?;
             """,
@@ -119,12 +122,12 @@ class ReceiptSQLiteStore:
         for item in cursor.fetchall():
             items.append(ItemRecord(*item))
 
-        return ReceiptRecord(receipt[0], receipt[1], items)
+        return ReceiptRecord(receipt[0], receipt[1], items, receipt[2])
 
     def list_all(self) -> list[ReceiptRecord]:
         cursor = self._conn.execute(
             """
-            SELECT id, open
+            SELECT id, open, paid
             FROM receipts;
             """
         )
@@ -144,19 +147,19 @@ class ReceiptSQLiteStore:
             for item in cursor.fetchall():
                 items.append(ItemRecord(*item))
 
-            receipts.append(ReceiptRecord(receipt[0], receipt[1], items))
+            receipts.append(ReceiptRecord(receipt[0], receipt[1], items, receipt[2]))
 
         return receipts
 
-    def close_receipt_by_id(self, unique_id: str) -> None:
+    def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         if (
             self._conn.execute(
                 """
             UPDATE receipts
-            SET open = 0
+            SET open = 0, paid = ?
             WHERE id = ?;
             """,
-                (unique_id,),
+                (paid, unique_id),
             ).rowcount
             == 0
         ):
