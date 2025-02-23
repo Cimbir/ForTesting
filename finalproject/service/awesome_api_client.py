@@ -7,10 +7,10 @@ from finalproject.service.http_client import HttpAPIClient, HttpAPIResponse
 
 AWESOME_API_DEFAULT_ENDPOINT = "https://economia.awesomeapi.com.br"
 AWESOME_API_CURRENCY_KEY_FORMAT = "{currency_from}{currency_to}"
-AWESOME_API_GET_EXCHANGE_RATE_PATH_FORMAT = "/last/{currency_from}-{currency_to}"
+AWESOME_API_GET_EXCHANGE_RATE_PATH_FORMAT = "/json/last/{currency_from}-{currency_to}"
 
 
-@dataclass
+@dataclass(frozen=True)
 class GetExchangeRateResponse:
     code: str = ""
     codein: str = ""
