@@ -35,7 +35,9 @@ class AwesomeAPIClient(Protocol):
 class DefaultAwesomeAPIClient:
     """
     This class implements client for the following public exchange rate API:
-    https://docs.awesomeapi.com.br/api-de-moedas?ref=public_apis&utm_medium=website
+    https://docs.awesomeapi.com.br/api-de-moedas
+
+    We found AwesomeAPI on public API registry: https://publicapi.dev/economia-awesome-api
     """
 
     def __init__(
@@ -54,8 +56,6 @@ class DefaultAwesomeAPIClient:
     ) -> GetExchangeRateResponse:
         """
         This method returns the exchange rate from USD to the specified currency.
-
-        Usage: /last/USD-GEL
         """
         http_response = self._http_client.get(
             self._exchange_rate_path.format(

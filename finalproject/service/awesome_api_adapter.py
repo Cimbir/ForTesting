@@ -1,12 +1,15 @@
 from finalproject.service.awesome_api_client import (
     AwesomeAPIClient,
+    DefaultAwesomeAPIClient,
     GetExchangeRateResponse,
 )
 from finalproject.service.currency_conversion import (
+    BaseCurrencyConversionService,
     BaseMidExchangeRateRetriever,
     ConversionError,
     MidExchangeRateRetriever,
 )
+from finalproject.service.http_client import HttpxAPIClient
 
 MEDIATOR_CURRENCY = "USD"
 
@@ -51,3 +54,18 @@ class AwesomeAPIFindAnyExchangeRateStrategy:
         return self._client.get_mid_rate(
             self._mediator_currency, to_currency
         ) / self._client.get_mid_rate(self._mediator_currency, from_currency)
+
+
+class AwesomeAPIFacade(BaseCurrencyConversionService):
+    """
+    This is class that implements CurrencyConversionService and uses AwesomeAPI
+    """
+
+    def __init__(
+        self, client: AwesomeAPIClient = DefaultAwesomeAPIClient(HttpxAPIClient())
+    ) -> None:
+        self._direct_api_client = client
+        self._adapter = AwesomeAPIFindAnyExchangeRateStrategy(
+            AwesomeAPIAdapter(self._direct_api_client)
+        )
+        super().__init__(self._adapter)

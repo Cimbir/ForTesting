@@ -55,7 +55,7 @@ class ConversionError(Exception):
     pass
 
 
-class DefaultCurrencyConversionService:
+class BaseCurrencyConversionService:
     def __init__(self, strategy: MidExchangeRateRetriever) -> None:
         self._exchange_rate_finder_strategy = strategy
 
