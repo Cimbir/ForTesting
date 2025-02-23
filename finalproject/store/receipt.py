@@ -57,6 +57,7 @@ class ReceiptSQLiteStore(SQLBasicStore[ReceiptRecord]):
 
         return [self._row_to_record(row) for row in cursor.fetchall()]
 
+
     def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         if (
             self._conn.execute(
