@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from typing import Any
 
-from finalproject.service.http_client import HttpAPIClient
+from finalproject.service.http_client import HttpAPIClient, HttpAPIResponse
 
 AWESOME_API_DEFAULT_ENDPOINT = "https://economia.awesomeapi.com.br"
 AWESOME_API_CURRENCY_KEY_FORMAT = "{currency_from}{currency_to}"
@@ -53,16 +52,28 @@ class AwesomeAPIClient:
                 currency_from=currency_from, currency_to=currency_to
             )
         )
+
+        # Raise error if server returns status code other than 200
+        if http_response.status_code != 200:
+            raise AwesomeAPIRequestFailed()
+
         return self._parse_exchange_rate_response(
             currency_from=currency_from,
             currency_to=currency_to,
-            data=http_response.json(),
+            response=http_response,
         )
 
     def _parse_exchange_rate_response(
-        self, currency_from: str, currency_to: str, data: Any
+        self, currency_from: str, currency_to: str, response: HttpAPIResponse
     ) -> GetExchangeRateResponse:
         key = self._currency_key_format.format(
             currency_from=currency_from, currency_to=currency_to
         )
-        return GetExchangeRateResponse(**data[key])
+        try:
+            return GetExchangeRateResponse(**response.json()[key])
+        except Exception:
+            raise AwesomeAPIRequestFailed()
+
+
+class AwesomeAPIRequestFailed(Exception):
+    pass

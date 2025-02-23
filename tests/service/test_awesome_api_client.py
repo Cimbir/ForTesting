@@ -1,10 +1,48 @@
 from unittest.mock import MagicMock, Mock, patch
 
+import pytest
+
 from finalproject.service.awesome_api_client import (
     AWESOME_API_GET_EXCHANGE_RATE_PATH_FORMAT,
     AwesomeAPIClient,
+    AwesomeAPIRequestFailed,
 )
 from finalproject.service.http_client import HttpxAPIClient
+
+
+@patch("httpx.get")
+def test_should_raise_error_when_status_code_is_not_200(mock_get: MagicMock) -> None:
+    client = AwesomeAPIClient(http_client=HttpxAPIClient())
+
+    # Make server return 404 not found error
+    mock_response = Mock()
+    mock_response.status_code = 404
+
+    mock_get.return_value = mock_response
+
+    pytest.raises(AwesomeAPIRequestFailed, client.get_exchange_rate, "USD", "GEL")
+
+
+@patch("httpx.get")
+def test_should_raise_error_when_server_returns_invalid_response(
+    mock_get: MagicMock,
+) -> None:
+    client = AwesomeAPIClient(http_client=HttpxAPIClient())
+
+    # Make server return malformed json
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_get.return_value = mock_response
+
+    mock_response.json.return_value = {"some_random_key": "some_random_value"}
+    pytest.raises(AwesomeAPIRequestFailed, client.get_exchange_rate, "USD", "GEL")
+
+    mock_response.json.return_value = {"USDGEL": "some_random_value"}
+    pytest.raises(AwesomeAPIRequestFailed, client.get_exchange_rate, "USD", "GEL")
+
+    # Make server return invalid json that raises some exception
+    mock_response.json.side_effect = ValueError()
+    pytest.raises(AwesomeAPIRequestFailed, client.get_exchange_rate, "USD", "GEL")
 
 
 @patch("httpx.get")
