@@ -8,6 +8,7 @@ from finalproject.store.product_discount import (
     ProductDiscountSQLiteStore,
     ProductDiscountStore,
 )
+from finalproject.store.receipt import ReceiptSQLiteStore, ReceiptStore
 from finalproject.store.receipt_discount import (
     ReceiptDiscountSQLiteStore,
     ReceiptDiscountStore,
@@ -23,6 +24,9 @@ class StoreDistributor(Protocol):
         pass
 
     def combos(self) -> ComboStore:
+        pass
+
+    def receipt(self) -> ReceiptStore:
         pass
 
     def receipt_discounts(self) -> ReceiptDiscountStore:
@@ -48,6 +52,7 @@ class SQLiteStoreDistributor:
         self._products = ProductSQLiteStore(connection)
         self._combos = ComboSQLiteStore(connection)
         self._buy_n_get_n = BuyNGetNSQLiteStore(connection)
+        self._receipt = ReceiptSQLiteStore(connection)
         self._receipt_discounts = ReceiptDiscountSQLiteStore(connection)
         self._product_discount = ProductDiscountSQLiteStore(connection)
         self._shifts = ShiftSQLiteStore(connection)
@@ -64,6 +69,9 @@ class SQLiteStoreDistributor:
 
     def combos(self) -> ComboStore:
         return self._combos
+
+    def receipt(self) -> ReceiptStore:
+        return self._receipt
 
     def receipt_discounts(self) -> ReceiptDiscountStore:
         return self._receipt_discounts
