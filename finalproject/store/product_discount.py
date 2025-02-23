@@ -6,8 +6,6 @@ from finalproject.store.sqlstore import SQLRemovableStore
 from finalproject.store.store import (
     BasicStore,
     Record,
-    RecordAlreadyExists,
-    RecordNotFound,
     RemovableStore,
 )
 
@@ -40,10 +38,10 @@ class ProductDiscountSQLiteStore(SQLRemovableStore[ProductDiscountRecord]):
         )
         self._conn.commit()
 
-    def _record_to_row(self, record: ProductDiscountRecord) -> tuple:
+    def _record_to_row(self, record: ProductDiscountRecord) -> tuple[str, str, float]:
         return record.id, record.product_id, record.discount
 
-    def _row_to_record(self, row: tuple) -> ProductDiscountRecord:
+    def _row_to_record(self, row: tuple[str, str, float]) -> ProductDiscountRecord:
         return ProductDiscountRecord(*row)
 
     def get_by_product_id(self, product_id: str) -> list[ProductDiscountRecord]:

@@ -2,12 +2,12 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Protocol
 
-from finalproject.store.sqlstore import SQLBasicStore, SQLUpdatableStore, SQLRemovableStore
+from finalproject.store.sqlstore import (
+    SQLRemovableStore,
+)
 from finalproject.store.store import (
     BasicStore,
     Record,
-    RecordAlreadyExists,
-    RecordNotFound,
     RemovableStore,
 )
 
@@ -39,10 +39,8 @@ class ReceiptDiscountSQLiteStore(SQLRemovableStore[ReceiptDiscountRecord]):
         )
         self._conn.commit()
 
-    def _record_to_row(self, record: ReceiptDiscountRecord) -> tuple:
+    def _record_to_row(self, record: ReceiptDiscountRecord) -> tuple[str, float, float]:
         return record.id, record.minimum_total, record.discount
 
-    def _row_to_record(self, row: tuple) -> ReceiptDiscountRecord:
+    def _row_to_record(self, row: tuple[str, float, float]) -> ReceiptDiscountRecord:
         return ReceiptDiscountRecord(*row)
-
-

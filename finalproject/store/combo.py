@@ -10,7 +10,6 @@ from finalproject.store.store import (
 )
 
 
-
 @dataclass(frozen=True)
 class ComboRecord(Record):
     id: str
@@ -42,8 +41,8 @@ class ComboSQLiteStore(SQLRemovableStore[ComboRecord]):
         )
         self._conn.commit()
 
-    def _record_to_row(self, record: ComboRecord) -> tuple:
+    def _record_to_row(self, record: ComboRecord) -> tuple[str, str, float]:
         return record.id, record.name, record.discount
 
-    def _row_to_record(self, row: tuple) -> ComboRecord:
+    def _row_to_record(self, row: tuple[str, str, float]) -> ComboRecord:
         return ComboRecord(*row)

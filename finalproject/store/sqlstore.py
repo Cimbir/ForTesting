@@ -1,7 +1,12 @@
 import sqlite3
 from typing import Any
 
-from finalproject.store.store import RecordT, RecordNotFound, RecordAlreadyExists, BasicStore
+from finalproject.store.store import (
+    BasicStore,
+    RecordAlreadyExists,
+    RecordNotFound,
+    RecordT,
+)
 
 
 class SQLBasicStore(BasicStore[RecordT]):
@@ -13,13 +18,14 @@ class SQLBasicStore(BasicStore[RecordT]):
     def _create_table(self) -> None:
         raise NotImplementedError
 
-    def _row_to_record(self, row: tuple[Any]) -> RecordT:
+    def _row_to_record(self, row: tuple[Any, ...]) -> RecordT:
         raise NotImplementedError
 
-    def _record_to_row(self, record: RecordT) -> tuple[Any]:
+    def _record_to_row(self, record: RecordT) -> tuple[Any, ...]:
         raise NotImplementedError
 
-    def add(self, record: RecordT) -> RecordT | None:
+    def add(self, record: RecordT) -> RecordT:
+        self._create_table()
         try:
             self.get_by_id(record.id)
             raise RecordAlreadyExists()
@@ -28,16 +34,18 @@ class SQLBasicStore(BasicStore[RecordT]):
             self._conn.execute(
                 f"INSERT INTO {self.table_name} VALUES "
                 f"({', '.join(['?'] * len(record_row))})",
-                record_row
+                record_row,
             )
             self._conn.commit()
             return record
 
     def list_all(self) -> list[RecordT]:
+        self._create_table()
         cursor = self._conn.execute(f"SELECT * FROM {self.table_name}")
         return [self._row_to_record(row) for row in cursor.fetchall()]
 
     def get_by_id(self, record_id: str) -> RecordT:
+        self._create_table()
         cursor = self._conn.execute(
             f"SELECT * FROM {self.table_name} WHERE id = ?", (record_id,)
         )
@@ -47,6 +55,7 @@ class SQLBasicStore(BasicStore[RecordT]):
         return self._row_to_record(row)
 
     def filter_by_field(self, field: str, value: str) -> list[RecordT]:
+        self._create_table()
         cursor = self._conn.execute(
             f"SELECT * FROM {self.table_name} WHERE {field} = ?", (value,)
         )
@@ -65,10 +74,11 @@ class SQLUpdatableStore(SQLBasicStore[RecordT]):
         set_part = ", ".join([f"{col} = ?" for col in columns[1:]])
         self._conn.execute(
             f"UPDATE {self.table_name} SET {set_part} WHERE id = ?",
-            (*record_data, record_id)
+            (*record_data, record_id),
         )
 
     def update(self, record: RecordT) -> RecordT:
+        self._create_table()
         if self.get_by_id(record.id) is None:
             raise RecordNotFound()
         self._update_record(record)
@@ -78,8 +88,11 @@ class SQLUpdatableStore(SQLBasicStore[RecordT]):
 
 class SQLRemovableStore(SQLBasicStore[RecordT]):
     def remove(self, record_id: str) -> None:
-        if self._conn.execute(
-            f"DELETE FROM {self.table_name} WHERE id = ?", (record_id,)
-        ).rowcount == 0:
+        if (
+            self._conn.execute(
+                f"DELETE FROM {self.table_name} WHERE id = ?", (record_id,)
+            ).rowcount
+            == 0
+        ):
             raise RecordNotFound()
         self._conn.commit()

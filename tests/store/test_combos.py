@@ -1,7 +1,6 @@
 import pytest
 
 from finalproject.store.combo import ComboRecord
-from finalproject.store.combo_item import ComboItemRecord
 from finalproject.store.distributor import StoreDistributor
 from finalproject.store.store import RecordAlreadyExists, RecordNotFound
 

@@ -3,18 +3,18 @@ from typing import Protocol
 
 from finalproject.store.buy_n_get_n import BuyNGetNSQLiteStore, BuyNGetNStore
 from finalproject.store.combo import ComboSQLiteStore, ComboStore
-from finalproject.store.combo_item import ComboItemStore, ComboItemSQLiteStore
+from finalproject.store.combo_item import ComboItemSQLiteStore, ComboItemStore
 from finalproject.store.product import ProductSQLiteStore, ProductStore
 from finalproject.store.product_discount import (
     ProductDiscountSQLiteStore,
     ProductDiscountStore,
 )
-from finalproject.store.receipt import ReceiptStore, ReceiptSQLiteStore
+from finalproject.store.receipt import ReceiptSQLiteStore, ReceiptStore
 from finalproject.store.receipt_discount import (
     ReceiptDiscountSQLiteStore,
     ReceiptDiscountStore,
 )
-from finalproject.store.receipt_items import ReceiptItemStore, ReceiptItemSQLiteStore
+from finalproject.store.receipt_item import ReceiptItemSQLiteStore, ReceiptItemStore
 from finalproject.store.shift import ShiftSQLiteStore, ShiftStore
 
 

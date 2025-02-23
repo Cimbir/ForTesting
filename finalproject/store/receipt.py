@@ -14,14 +14,12 @@ class ReceiptRecord(Record):
     shift_id: str
 
 
-
 class ReceiptStore(BasicStore[ReceiptRecord], Protocol):
     def get_by_shift_id(self, shift_id: str) -> list[ReceiptRecord]:
         pass
 
     def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         pass
-
 
 
 class ReceiptSQLiteStore(SQLBasicStore[ReceiptRecord]):
@@ -41,10 +39,10 @@ class ReceiptSQLiteStore(SQLBasicStore[ReceiptRecord]):
         )
         self._conn.commit()
 
-    def _record_to_row(self, record: ReceiptRecord) -> tuple:
+    def _record_to_row(self, record: ReceiptRecord) -> tuple[str, bool, float, str]:
         return record.id, record.open, record.paid, record.shift_id
 
-    def _row_to_record(self, row: tuple) -> ReceiptRecord:
+    def _row_to_record(self, row: tuple[str, bool, float, str]) -> ReceiptRecord:
         return ReceiptRecord(*row)
 
     def get_by_shift_id(self, shift_id: str) -> list[ReceiptRecord]:
@@ -63,7 +61,7 @@ class ReceiptSQLiteStore(SQLBasicStore[ReceiptRecord]):
         if (
             self._conn.execute(
                 """
-            UPDATE receipts
+            UPDATE receipt
             SET open = 0, paid = ?
             WHERE id = ?;
             """,

@@ -6,8 +6,6 @@ from finalproject.store.sqlstore import SQLUpdatableStore
 from finalproject.store.store import (
     BasicStore,
     Record,
-    RecordAlreadyExists,
-    RecordNotFound,
     UpdatableStore,
 )
 
@@ -47,8 +45,8 @@ class ProductSQLiteStore(SQLUpdatableStore[ProductRecord]):
     def _columns(self) -> list[str]:
         return ["id", "name", "price"]
 
-    def _record_to_row(self, record: ProductRecord) -> tuple:
+    def _record_to_row(self, record: ProductRecord) -> tuple[str, str, float]:
         return record.id, record.name, record.price
 
-    def _row_to_record(self, row: tuple) -> ProductRecord:
+    def _row_to_record(self, row: tuple[str, str, float]) -> ProductRecord:
         return ProductRecord(*row)

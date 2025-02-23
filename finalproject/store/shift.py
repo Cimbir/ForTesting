@@ -6,8 +6,6 @@ from finalproject.store.sqlstore import SQLUpdatableStore
 from finalproject.store.store import (
     BasicStore,
     Record,
-    RecordAlreadyExists,
-    RecordNotFound,
     UpdatableStore,
 )
 
@@ -44,9 +42,8 @@ class ShiftSQLiteStore(SQLUpdatableStore[ShiftRecord]):
     def _columns(self) -> list[str]:
         return ["id", "status", "start_time", "end_time"]
 
-    def _record_to_row(self, record: ShiftRecord) -> tuple:
-        return (record.id, record.status, record.start_time, record.end_time)
+    def _record_to_row(self, record: ShiftRecord) -> tuple[str, str, str, str]:
+        return record.id, record.status, record.start_time, record.end_time
 
-    def _row_to_record(self, row: tuple) -> ShiftRecord:
+    def _row_to_record(self, row: tuple[str, str, str, str]) -> ShiftRecord:
         return ShiftRecord(*row)
-

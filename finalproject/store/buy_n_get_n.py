@@ -6,8 +6,6 @@ from finalproject.store.sqlstore import SQLRemovableStore
 from finalproject.store.store import (
     BasicStore,
     Record,
-    RecordAlreadyExists,
-    RecordNotFound,
     RemovableStore,
 )
 
@@ -44,10 +42,16 @@ class BuyNGetNSQLiteStore(SQLRemovableStore[BuyNGetNRecord]):
         )
         self._conn.commit()
 
-    def _record_to_row(self, record: BuyNGetNRecord) -> tuple:
-        return record.id, record.buy_product_id, record.buy_product_n, record.get_product_id, record.get_product_n
+    def _record_to_row(self, record: BuyNGetNRecord) -> tuple[str, str, int, str, int]:
+        return (
+            record.id,
+            record.buy_product_id,
+            record.buy_product_n,
+            record.get_product_id,
+            record.get_product_n,
+        )
 
-    def _row_to_record(self, row: tuple) -> BuyNGetNRecord:
+    def _row_to_record(self, row: tuple[str, str, int, str, int]) -> BuyNGetNRecord:
         return BuyNGetNRecord(*row)
 
     def get_by_product_id(self, product_id: str) -> list[BuyNGetNRecord]:

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from finalproject.store.receipt import ReceiptRecord
-from finalproject.store.receipt_items import ReceiptItemRecord
+from finalproject.store.receipt_item import ReceiptItemRecord
 
 
 class Model(Protocol):
@@ -16,10 +16,10 @@ class ReceiptItem(Model):
     quantity: int
     price: float
 
-
-    def to_record(self) -> ReceiptItemRecord:
+    def to_record(self, receipt_id: str) -> ReceiptItemRecord:
         return ReceiptItemRecord(
             id=self.id,
+            receipt_id=receipt_id,
             product_id=self.product_id,
             quantity=self.quantity,
             price=self.price,
@@ -33,6 +33,7 @@ class ReceiptItem(Model):
             quantity=record.quantity,
             price=record.price,
         )
+
 
 @dataclass(frozen=True)
 class Receipt(Model):
@@ -59,4 +60,3 @@ class Receipt(Model):
             shift_id=record.shift_id,
             items=items,
         )
-

@@ -6,22 +6,22 @@ from finalproject.store.sqlstore import SQLRemovableStore
 from finalproject.store.store import (
     BasicStore,
     Record,
-    RecordAlreadyExists,
-    RecordNotFound,
     RemovableStore,
 )
 
 
 @dataclass(frozen=True)
-class ComboItemRecord:
+class ComboItemRecord(Record):
     id: str
     product_id: str
     quantity: int
+
 
 class ComboItemStore(BasicStore[ComboItemRecord], RemovableStore, Protocol):
     """
     Add methods unique to ComboStore here
     """
+
     pass
 
 
@@ -31,8 +31,8 @@ class ComboItemSQLiteStore(SQLRemovableStore[ComboItemRecord]):
 
     def _create_table(self) -> None:
         self._conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS combo_item (
+            f"""
+            CREATE TABLE IF NOT EXISTS {self.table_name} (
                 id TEXT PRIMARY KEY,
                 product_id TEXT,
                 quantity INTEGER
@@ -41,8 +41,8 @@ class ComboItemSQLiteStore(SQLRemovableStore[ComboItemRecord]):
         )
         self._conn.commit()
 
-    def _record_to_row(self, record: ComboItemRecord) -> tuple:
+    def _record_to_row(self, record: ComboItemRecord) -> tuple[str, str, int]:
         return record.id, record.product_id, record.quantity
 
-    def _row_to_record(self, row: tuple) -> ComboItemRecord:
+    def _row_to_record(self, row: tuple[str, str, int]) -> ComboItemRecord:
         return ComboItemRecord(*row)
