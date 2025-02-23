@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import Protocol
 
 from finalproject.service.http_client import HttpAPIClient, HttpAPIResponse
 
@@ -9,20 +12,27 @@ AWESOME_API_GET_EXCHANGE_RATE_PATH_FORMAT = "/last/{currency_from}-{currency_to}
 
 @dataclass
 class GetExchangeRateResponse:
-    code: str
-    codein: str
-    name: str
-    high: str
-    low: str
-    varBid: str
-    pctChange: str
-    bid: str
-    ask: str
-    timestamp: str
-    create_date: str
+    code: str = ""
+    codein: str = ""
+    name: str = ""
+    high: str = ""
+    low: str = ""
+    varBid: str = ""
+    pctChange: str = ""
+    bid: str = ""
+    ask: str = ""
+    timestamp: str = ""
+    create_date: str = ""
 
 
-class AwesomeAPIClient:
+class AwesomeAPIClient(Protocol):
+    def get_exchange_rate(
+        self, currency_from: str, currency_to: str
+    ) -> GetExchangeRateResponse:
+        pass
+
+
+class DefaultAwesomeAPIClient:
     """
     This class implements client for the following public exchange rate API:
     https://docs.awesomeapi.com.br/api-de-moedas?ref=public_apis&utm_medium=website
@@ -77,3 +87,19 @@ class AwesomeAPIClient:
 
 class AwesomeAPIRequestFailed(Exception):
     pass
+
+
+class FakeAwesomeAPIClient:
+    def __init__(self) -> None:
+        self._fake_response = GetExchangeRateResponse()
+
+    def with_fake_response(
+        self, response: GetExchangeRateResponse
+    ) -> FakeAwesomeAPIClient:
+        self._fake_response = response
+        return self
+
+    def get_exchange_rate(
+        self, currency_from: str, currency_to: str
+    ) -> GetExchangeRateResponse:
+        return self._fake_response

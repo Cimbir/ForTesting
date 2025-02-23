@@ -3,6 +3,7 @@ from finalproject.service.awesome_api_client import (
     GetExchangeRateResponse,
 )
 from finalproject.service.currency_conversion import (
+    BaseMidExchangeRateRetriever,
     ConversionError,
     MidExchangeRateRetriever,
 )
@@ -10,7 +11,7 @@ from finalproject.service.currency_conversion import (
 MEDIATOR_CURRENCY = "USD"
 
 
-class AwesomeAPIAdapter:
+class AwesomeAPIAdapter(BaseMidExchangeRateRetriever):
     """
     This class converts AwesomeAPIClient calls to our MidExchangeRateRetriever methods.
     """
@@ -18,10 +19,9 @@ class AwesomeAPIAdapter:
     def __init__(self, client: AwesomeAPIClient) -> None:
         self._client = client
 
-    def get_mid_rate(self, from_currency: str, to_currency: str) -> float:
-        if from_currency == to_currency:
-            return 1
-
+    def _get_mid_rate_between_different_currencies(
+        self, from_currency: str, to_currency: str
+    ) -> float:
         return self._calculate_mid_rate(
             self._client.get_exchange_rate(from_currency, to_currency)
         )

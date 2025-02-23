@@ -4,15 +4,15 @@ import pytest
 
 from finalproject.service.awesome_api_client import (
     AWESOME_API_GET_EXCHANGE_RATE_PATH_FORMAT,
-    AwesomeAPIClient,
     AwesomeAPIRequestFailed,
+    DefaultAwesomeAPIClient,
 )
 from finalproject.service.http_client import HttpxAPIClient
 
 
 @patch("httpx.get")
 def test_should_raise_error_when_status_code_is_not_200(mock_get: MagicMock) -> None:
-    client = AwesomeAPIClient(http_client=HttpxAPIClient())
+    client = DefaultAwesomeAPIClient(http_client=HttpxAPIClient())
 
     # Make server return 404 not found error
     mock_response = Mock()
@@ -27,7 +27,7 @@ def test_should_raise_error_when_status_code_is_not_200(mock_get: MagicMock) -> 
 def test_should_raise_error_when_server_returns_invalid_response(
     mock_get: MagicMock,
 ) -> None:
-    client = AwesomeAPIClient(http_client=HttpxAPIClient())
+    client = DefaultAwesomeAPIClient(http_client=HttpxAPIClient())
 
     # Make server return malformed json
     mock_response = Mock()
@@ -49,7 +49,9 @@ def test_should_raise_error_when_server_returns_invalid_response(
 
 @patch("httpx.get")
 def test_should_get_exchange_rate(mock_get: MagicMock) -> None:
-    client = AwesomeAPIClient(http_client=HttpxAPIClient(), endpoint="http://127.0.0.1")
+    client = DefaultAwesomeAPIClient(
+        http_client=HttpxAPIClient(), endpoint="http://127.0.0.1"
+    )
 
     # Define fake exchange rate data
     exchange_rate_data_from_server = {
