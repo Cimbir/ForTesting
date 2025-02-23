@@ -1,4 +1,5 @@
 import sqlite3
+from abc import abstractmethod
 from typing import Any
 
 from finalproject.store.store import (
@@ -15,14 +16,17 @@ class SQLBasicStore(BasicStore[RecordT]):
         self.table_name = table_name
         self._create_table()
 
+    @abstractmethod
     def _create_table(self) -> None:
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def _row_to_record(self, row: tuple[Any, ...]) -> RecordT:
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def _record_to_row(self, record: RecordT) -> tuple[Any, ...]:
-        raise NotImplementedError
+        pass
 
     def add(self, record: RecordT) -> RecordT:
         self._create_table()
@@ -63,8 +67,9 @@ class SQLBasicStore(BasicStore[RecordT]):
 
 
 class SQLUpdatableStore(SQLBasicStore[RecordT]):
+    @abstractmethod
     def _columns(self) -> list[str]:
-        raise NotImplementedError()
+        pass
 
     def _update_record(self, record: RecordT) -> None:
         record_row = self._record_to_row(record)
