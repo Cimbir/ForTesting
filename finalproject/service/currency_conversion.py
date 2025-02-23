@@ -51,6 +51,10 @@ class CurrencyConversionService(Protocol):
         pass
 
 
+class ConversionRequestFailed(Exception):
+    pass
+
+
 class ConversionError(Exception):
     pass
 
