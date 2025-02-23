@@ -1,12 +1,16 @@
 from finalproject.service.awesome_api_adapter import (
     AwesomeAPIAdapter,
+    AwesomeAPIFacade,
     AwesomeAPIFindAnyExchangeRateStrategy,
 )
 from finalproject.service.awesome_api_client import (
     FakeAwesomeAPIClient,
     GetExchangeRateResponse,
 )
-from finalproject.service.currency_conversion import MockMidExchangeRateRetriever
+from finalproject.service.currency_conversion import (
+    CurrencyConversionService,
+    MockMidExchangeRateRetriever,
+)
 
 
 def test_should_calculate_mid_exchange_rate_from_bid_and_ask() -> None:
@@ -37,3 +41,12 @@ def test_should_execute_correct_strategy_to_find_exchange_rates() -> None:
     mock_rate_retriever.add_rate("USD", "GEL", 2.8)
     assert rate_calculator.get_mid_rate("JPY", "GEL") == 2.8 / 150
     assert rate_calculator.get_mid_rate("GEL", "JPY") == 150 / 2.8
+
+
+def test_should_use_facade_to_setup_service() -> None:
+    fake_client = FakeAwesomeAPIClient().with_fake_response(
+        GetExchangeRateResponse(bid="3", ask="2")
+    )
+
+    service: CurrencyConversionService = AwesomeAPIFacade(fake_client)
+    assert service.convert(100, "USD", "GEL") == 250.0
