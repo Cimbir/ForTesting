@@ -34,9 +34,11 @@ def test_should_raise_error_when_server_returns_invalid_response(
     mock_response.status_code = 200
     mock_get.return_value = mock_response
 
+    # This should raise KeyError
     mock_response.json.return_value = {"some_random_key": "some_random_value"}
     pytest.raises(AwesomeAPIRequestFailed, client.get_exchange_rate, "USD", "GEL")
 
+    # This should raise TypeError
     mock_response.json.return_value = {"USDGEL": "some_random_value"}
     pytest.raises(AwesomeAPIRequestFailed, client.get_exchange_rate, "USD", "GEL")
 
