@@ -1,6 +1,7 @@
 from typing import List
 
 from finalproject.models.product import Product
+from finalproject.service.exceptions import ProductNotFound
 from finalproject.service.store_utils import generate_id
 from finalproject.store.product import ProductStore
 from finalproject.store.store import RecordNotFound
@@ -28,6 +29,9 @@ class ProductService:
         return products
 
     def update_product(self, product: Product) -> Product:
-        self.product_store.update(product.to_record())
+        try:
+            self.product_store.update(product.to_record())
+        except RecordNotFound:
+            raise ProductNotFound(product.id)
         return product
 

@@ -5,6 +5,7 @@ from fastapi.requests import Request
 from pydantic import BaseModel
 
 from finalproject.models.product import Product
+from finalproject.service.exceptions import ProductNotFound
 from finalproject.service.products import ProductService
 from finalproject.store.product import ProductStore
 from finalproject.store.store import RecordAlreadyExists, RecordNotFound
@@ -56,10 +57,7 @@ def add_product(
     product_service: ProductService = Depends(get_product_service),
 ) -> SingleProductResponse:
     product = Product(id='', name=product_request.name, price=product_request.price)
-    try:
-        product_service.add_product(product)
-    except RecordAlreadyExists:
-        raise HTTPException(status_code=409, detail="Product already exists")
+    product_service.add_product(product)
     return SingleProductResponse(product=product)
 
 @products_api.get(
@@ -73,7 +71,7 @@ def get_product(
 ) -> SingleProductResponse:
     try:
         product = product_service.get_product(product_id)
-    except RecordNotFound:
+    except ProductNotFound:
         raise HTTPException(status_code=404, detail=f"Product with id={product_id} not found")
     return SingleProductResponse(product=product)
 
@@ -90,7 +88,7 @@ def update_product(
     product = Product(id=product_id, name=product_request.name, price=product_request.price)
     try:
         product_service.update_product(product)
-    except RecordNotFound:
+    except ProductNotFound:
         raise HTTPException(status_code=404, detail=f"Product with id={product_id} not found")
     return SingleProductResponse(product=product
 )
