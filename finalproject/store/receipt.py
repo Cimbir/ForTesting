@@ -2,22 +2,14 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Protocol
 
+from finalproject.store.sqlstore import SQLBasicStore
 from finalproject.store.store import BasicStore, Record, RecordNotFound
-
-
-@dataclass(frozen=True)
-class ReceiptItemRecord(Record):
-    id: str
-    product_id: str
-    quantity: int
-    price: float
 
 
 @dataclass(frozen=True)
 class ReceiptRecord(Record):
     id: str
     open: bool
-    items: list[ReceiptItemRecord]
     paid: float
     shift_id: str
 
@@ -29,27 +21,15 @@ class ReceiptStore(BasicStore[ReceiptRecord], Protocol):
     def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         pass
 
-    def add_item_to_receipt(
-        self, receipt_id: str, item: ReceiptItemRecord
-    ) -> ReceiptItemRecord:
-        pass
 
-    def update_item_in_receipt(
-        self, receipt_id: str, item: ReceiptItemRecord
-    ) -> ReceiptItemRecord:
-        pass
-
-    def remove_item_from_receipt(self, item_id: str) -> None:
-        pass
-
-
-class ReceiptSQLiteStore:
+class ReceiptSQLiteStore(SQLBasicStore[ReceiptRecord]):
     def __init__(self, connection: sqlite3.Connection) -> None:
-        self._conn = connection
+        super().__init__(connection, "receipt")
 
+    def _create_table(self) -> None:
         self._conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS receipts (
+            CREATE TABLE IF NOT EXISTS receipt (
                 id TEXT PRIMARY KEY,
                 open BOOLEAN,
                 paid REAL,
@@ -59,120 +39,30 @@ class ReceiptSQLiteStore:
         )
         self._conn.commit()
 
-        self._conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS receipt_items (
-                id TEXT PRIMARY KEY,
-                receipt_id TEXT,
-                product_id TEXT,
-                quantity INTEGER,
-                price REAL
-            );
-            """
-        )
-        self._conn.commit()
+    def _record_to_row(self, record: ReceiptRecord) -> tuple[str, bool, float, str]:
+        return record.id, record.open, record.paid, record.shift_id
 
-    def add(self, record: ReceiptRecord) -> ReceiptRecord:
-        self._conn.execute(
+    def _row_to_record(self, row: tuple[str, bool, float, str]) -> ReceiptRecord:
+        return ReceiptRecord(*row)
+
+    def get_by_shift_id(self, shift_id: str) -> list[ReceiptRecord]:
+        cursor = self._conn.cursor()
+        cursor.execute(
             """
-                INSERT INTO receipts(id, open, paid, shift_id)
-                VALUES (?, ?, ?, ?);
+            SELECT * FROM receipt
+            WHERE shift_id = ?;
             """,
-            (
-                record.id,
-                record.open,
-                record.paid,
-                record.shift_id,
-            ),
+            (shift_id,),
         )
 
-        for item in record.items:
-            self._conn.execute(
-                """
-                    INSERT INTO receipt_items(
-                    id, 
-                    receipt_id, 
-                    product_id, 
-                    quantity, 
-                    price)
-                    VALUES (?, ?, ?, ?, ?);
-                """,
-                (
-                    item.id,
-                    record.id,
-                    item.product_id,
-                    item.quantity,
-                    item.price,
-                ),
-            )
+        return [self._row_to_record(row) for row in cursor.fetchall()]
 
-        self._conn.commit()
-
-        return record
-
-    def get_by_id(self, unique_id: str) -> ReceiptRecord:
-        cursor = self._conn.execute(
-            """
-            SELECT id, open, paid, shift_id
-            FROM receipts
-            WHERE id = ?;
-            """,
-            (unique_id,),
-        )
-
-        receipt = cursor.fetchone()
-        if receipt is None:
-            raise RecordNotFound()
-
-        cursor = self._conn.execute(
-            """
-            SELECT id, product_id, quantity, price
-            FROM receipt_items
-            WHERE receipt_id = ?;
-            """,
-            (unique_id,),
-        )
-
-        items = []
-        for item in cursor.fetchall():
-            items.append(ReceiptItemRecord(*item))
-
-        return ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3])
-
-    def list_all(self) -> list[ReceiptRecord]:
-        cursor = self._conn.execute(
-            """
-            SELECT id, open, paid, shift_id
-            FROM receipts;
-            """
-        )
-
-        receipts = []
-        for receipt in cursor.fetchall():
-            cursor = self._conn.execute(
-                """
-                SELECT id, product_id, quantity, price
-                FROM receipt_items
-                WHERE receipt_id = ?;
-                """,
-                (receipt[0],),
-            )
-
-            items = []
-            for item in cursor.fetchall():
-                items.append(ReceiptItemRecord(*item))
-
-            receipts.append(
-                ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3])
-            )
-
-        return receipts
 
     def close_receipt_by_id(self, unique_id: str, paid: float) -> None:
         if (
             self._conn.execute(
                 """
-            UPDATE receipts
+            UPDATE receipt
             SET open = 0, paid = ?
             WHERE id = ?;
             """,
@@ -183,109 +73,3 @@ class ReceiptSQLiteStore:
             raise RecordNotFound()
 
         self._conn.commit()
-
-    def add_item_to_receipt(
-        self, receipt_id: str, item: ReceiptItemRecord
-    ) -> ReceiptItemRecord:
-        if (
-            self._conn.execute(
-                """
-            SELECT id
-            FROM receipts
-            WHERE id = ?;
-            """,
-                (receipt_id,),
-            ).fetchone()
-            is None
-        ):
-            raise RecordNotFound()
-
-        self._conn.execute(
-            """
-            INSERT INTO receipt_items(id, receipt_id, product_id, quantity, price)
-            VALUES (?, ?, ?, ?, ?);
-            """,
-            (
-                item.id,
-                receipt_id,
-                item.product_id,
-                item.quantity,
-                item.price,
-            ),
-        )
-        self._conn.commit()
-
-        return item
-
-    def update_item_in_receipt(
-        self, receipt_id: str, item: ReceiptItemRecord
-    ) -> ReceiptItemRecord:
-        if (
-            self._conn.execute(
-                """
-            UPDATE receipt_items
-            SET quantity = ?, price = ?
-            WHERE product_id = ? AND receipt_id = ?;
-            """,
-                (
-                    item.quantity,
-                    item.price,
-                    item.product_id,
-                    receipt_id,
-                ),
-            ).rowcount
-            == 0
-        ):
-            raise RecordNotFound()
-
-        self._conn.commit()
-
-        return item
-
-    def remove_item_from_receipt(self, item_id: str) -> None:
-        if (
-            self._conn.execute(
-                """
-            DELETE FROM receipt_items
-            WHERE id = ?;
-            """,
-                (item_id,),
-            ).rowcount
-            == 0
-        ):
-            raise RecordNotFound()
-
-        self._conn.commit()
-
-        return None
-
-    def get_by_shift_id(self, shift_id: str) -> list[ReceiptRecord]:
-        cursor = self._conn.execute(
-            """
-            SELECT id, open, paid, shift_id
-            FROM receipts
-            WHERE shift_id = ?;
-            """,
-            (shift_id,),
-        )
-
-        receipts = []
-        for receipt in cursor.fetchall():
-            cursor = self._conn.execute(
-                """
-                SELECT id, product_id, quantity, price
-                FROM receipt_items
-                WHERE receipt_id = ?;
-                """,
-                (receipt[0],),
-            )
-
-            items = []
-            for item in cursor.fetchall():
-                items.append(ReceiptItemRecord(*item))
-
-            receipts.append(
-                ReceiptRecord(receipt[0], receipt[1], items, receipt[2], receipt[3])
-            )
-
-        return receipts

@@ -1,6 +1,6 @@
 import pytest
 
-from finalproject.store.combo import ComboItem, ComboRecord
+from finalproject.store.combo import ComboRecord
 from finalproject.store.distributor import StoreDistributor
 from finalproject.store.store import RecordAlreadyExists, RecordNotFound
 
@@ -12,10 +12,6 @@ def test_should_add_and_get_combo(distributor: StoreDistributor) -> None:
         id="unique-id-1",
         name="Combo 1",
         discount=0.1,
-        combo_list=[
-            ComboItem(product_id="unique-id-1", quantity=1),
-            ComboItem(product_id="unique-id-2", quantity=2),
-        ],
     )
     combo_store.add(combo)
 
@@ -29,17 +25,11 @@ def test_should_list_all_combos(distributor: StoreDistributor) -> None:
         id="unique-id-1",
         name="Combo 1",
         discount=0.1,
-        combo_list=[
-            ComboItem(product_id="unique-id-1", quantity=1),
-        ],
     )
     combo2 = ComboRecord(
         id="unique-id-2",
         name="Combo 2",
         discount=0.2,
-        combo_list=[
-            ComboItem(product_id="unique-id-1", quantity=2),
-        ],
     )
 
     combo_store.add(combo1)
@@ -58,9 +48,6 @@ def test_should_remove_combo(distributor: StoreDistributor) -> None:
         id="unique-id-1",
         name="Combo 1",
         discount=0.1,
-        combo_list=[
-            ComboItem(product_id="unique-id-1", quantity=1),
-        ],
     )
     combo_store.add(combo)
 
@@ -74,8 +61,8 @@ def test_should_raise_error_when_adding_combo_with_same_id(
 ) -> None:
     combo_store = distributor.combos()
 
-    combo1 = ComboRecord(id="unique-id-1", name="Combo 1", discount=0.1, combo_list=[])
-    combo2 = ComboRecord(id="unique-id-1", name="Combo 2", discount=0.2, combo_list=[])
+    combo1 = ComboRecord(id="unique-id-1", name="Combo 1", discount=0.1)
+    combo2 = ComboRecord(id="unique-id-1", name="Combo 2", discount=0.2)
 
     combo_store.add(combo1)
     pytest.raises(RecordAlreadyExists, combo_store.add, combo2)

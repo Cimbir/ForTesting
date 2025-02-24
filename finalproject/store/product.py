@@ -2,11 +2,10 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Protocol
 
+from finalproject.store.sqlstore import SQLUpdatableStore
 from finalproject.store.store import (
     BasicStore,
     Record,
-    RecordAlreadyExists,
-    RecordNotFound,
     UpdatableStore,
 )
 
@@ -27,13 +26,14 @@ class ProductStore(BasicStore[ProductRecord], UpdatableStore[ProductRecord], Pro
     pass
 
 
-class ProductSQLiteStore:
+class ProductSQLiteStore(SQLUpdatableStore[ProductRecord]):
     def __init__(self, connection: sqlite3.Connection) -> None:
-        self._conn = connection
+        super().__init__(connection, "product")
 
+    def _create_table(self) -> None:
         self._conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS products (
+            CREATE TABLE IF NOT EXISTS product (
                 id TEXT PRIMARY KEY,
                 name TEXT,
                 price REAL
@@ -42,65 +42,11 @@ class ProductSQLiteStore:
         )
         self._conn.commit()
 
-    def add(self, record: ProductRecord) -> ProductRecord:
-        try:
-            self._conn.execute(
-                """
-                    INSERT INTO products(id, name, price)
-                    VALUES (?, ?, ?);
-                """,
-                (
-                    record.id,
-                    record.name,
-                    record.price,
-                ),
-            )
-        except sqlite3.IntegrityError:
-            raise RecordAlreadyExists()
+    def _columns(self) -> list[str]:
+        return ["id", "name", "price"]
 
-        self._conn.commit()
-        return record
+    def _record_to_row(self, record: ProductRecord) -> tuple[str, str, float]:
+        return record.id, record.name, record.price
 
-    def get_by_id(self, unique_id: str) -> ProductRecord:
-        record = self._conn.execute(
-            """
-                SELECT id, name, price FROM products WHERE id = ?;
-            """,
-            (unique_id,),
-        ).fetchone()
-
-        if record is None:
-            raise RecordNotFound()
-
-        return ProductRecord(id=record[0], name=record[1], price=record[2])
-
-    def list_all(self) -> list[ProductRecord]:
-        records = self._conn.execute(
-            """
-                SELECT id, name, price FROM products;
-            """
-        ).fetchall()
-
-        return [
-            ProductRecord(id=record[0], name=record[1], price=record[2])
-            for record in records
-        ]
-
-    def update(self, record: ProductRecord) -> ProductRecord:
-        result = self._conn.execute(
-            """
-            UPDATE products
-            SET name = ?, price = ?
-            WHERE id = ?;
-            """,
-            (
-                record.name,
-                record.price,
-                record.id,
-            ),
-        )
-
-        if result.rowcount == 0:
-            raise RecordNotFound()
-
-        return record
+    def _row_to_record(self, row: tuple[str, str, float]) -> ProductRecord:
+        return ProductRecord(*row)
