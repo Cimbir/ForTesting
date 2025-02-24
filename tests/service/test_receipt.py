@@ -1,12 +1,14 @@
 import pytest
 
 from finalproject.models.models import Receipt, ReceiptItem
-from finalproject.service.receipts import (
+from finalproject.service.exceptions import (
     ProductNotFound,
     ReceiptItemNotFound,
     ReceiptNotFound,
-    ReceiptService,
     ShiftNotFound,
+)
+from finalproject.service.receipts import (
+    ReceiptService,
 )
 from finalproject.store.product import ProductRecord
 from finalproject.store.shift import ShiftRecord

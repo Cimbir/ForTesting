@@ -1,35 +1,17 @@
 from finalproject.models.models import Receipt, ReceiptItem
+from finalproject.service.exceptions import (
+    ProductNotFound,
+    ReceiptAlreadyExists,
+    ReceiptItemNotFound,
+    ReceiptNotFound,
+    ShiftNotFound,
+)
 from finalproject.store.product import ProductStore
 from finalproject.store.receipt import ReceiptStore
 from finalproject.store.receipt_item import ReceiptItemStore
 from finalproject.store.shift import ShiftStore
 from finalproject.store.store import RecordAlreadyExists, RecordNotFound
 from tests.service.service_utils import generate_id
-
-
-class ShiftNotFound(Exception):
-    def __init__(self, shift_id: str) -> None:
-        super().__init__(f"Shift with id {shift_id} not found")
-
-
-class ReceiptAlreadyExists(Exception):
-    def __init__(self, receipt_id: str) -> None:
-        super().__init__(f"Receipt with id {receipt_id} already exists")
-
-
-class ProductNotFound(Exception):
-    def __init__(self, product_id: str) -> None:
-        super().__init__(f"Product with id {product_id} not found")
-
-
-class ReceiptNotFound(Exception):
-    def __init__(self, receipt_id: str) -> None:
-        super().__init__(f"Receipt with id {receipt_id} not found")
-
-
-class ReceiptItemNotFound(Exception):
-    def __init__(self, item_id: str) -> None:
-        super().__init__(f"Receipt item with id {item_id} not found")
 
 
 class ReceiptService:
