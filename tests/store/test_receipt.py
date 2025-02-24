@@ -68,7 +68,8 @@
 #
 #     assert len(receipt_store.list_all()) == 0
 #
-#     receipt_1 = receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+#     receipt_1 = receipt_store.add(ReceiptRecord(id="1",
+#     open=True, items=[], paid=0, shift_id="1"))
 #     receipt_2 = receipt_store.add(
 #         ReceiptRecord(
 #             id="2",
@@ -92,7 +93,8 @@
 # ) -> None:
 #     receipt_store = distributor.receipt()
 #
-#     receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+#     receipt_store.add(ReceiptRecord(id="1",
+#     open=True, items=[], paid=0, shift_id="1"))
 #
 #     pytest.raises(RecordNotFound, receipt_store.get_by_id, "2")
 #
@@ -100,7 +102,8 @@
 # def test_should_close_receipt(distributor: StoreDistributor) -> None:
 #     receipt_store = distributor.receipt()
 #
-#     receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+#     receipt_store.add(ReceiptRecord(id="1",
+#     open=True, items=[], paid=0, shift_id="1"))
 #
 #     receipt_store.close_receipt_by_id("1", 10)
 #
@@ -113,7 +116,8 @@
 # ) -> None:
 #     receipt_store = distributor.receipt()
 #
-#     receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+#     receipt_store.add(ReceiptRecord(id="1",
+#     open=True, items=[], paid=0, shift_id="1"))
 #
 #     pytest.raises(RecordNotFound, receipt_store.close_receipt_by_id, "2", 10)
 #
@@ -121,7 +125,8 @@
 # def test_should_add_item_to_receipt(distributor: StoreDistributor) -> None:
 #     receipt_store = distributor.receipt()
 #
-#     receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+#     receipt_store.add(ReceiptRecord(id="1",
+#     open=True, items=[], paid=0, shift_id="1"))
 #
 #     receipt_store.add_item_to_receipt(
 #         receipt_id="1",
@@ -142,7 +147,8 @@
 # ) -> None:
 #     receipt_store = distributor.receipt()
 #
-#     receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+#     receipt_store.add(ReceiptRecord(id="1",
+#     open=True, items=[], paid=0, shift_id="1"))
 #
 #     pytest.raises(
 #         RecordNotFound,
@@ -184,7 +190,8 @@
 # ) -> None:
 #     receipt_store = distributor.receipt()
 #
-#     receipt = receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+#     receipt = receipt_store.add(ReceiptRecord(id="1",
+#     open=True, items=[], paid=0, shift_id="1"))
 #
 #     pytest.raises(
 #         RecordNotFound,
@@ -223,7 +230,8 @@
 # ) -> None:
 #     receipt_store = distributor.receipt()
 #
-#     receipt_store.add(ReceiptRecord(id="1", open=True, items=[], paid=0, shift_id="1"))
+#     receipt_store.add(ReceiptRecord(id="1",
+#     open=True, items=[], paid=0, shift_id="1"))
 #
 #     pytest.raises(
 #         RecordNotFound,
