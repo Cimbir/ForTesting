@@ -11,4 +11,9 @@ def distributor() -> StoreDistributor:
 
 @pytest.fixture
 def receipt_service(distributor: StoreDistributor) -> ReceiptService:
-    return ReceiptService(distributor.receipt(), distributor.receipt_items())
+    return ReceiptService(
+        distributor.receipt(),
+        distributor.receipt_items(),
+        distributor.shifts(),
+        distributor.products(),
+    )
