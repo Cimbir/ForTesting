@@ -3,11 +3,10 @@ from finalproject.models.models import Receipt
 from finalproject.service.receipt_close.receipt_close import (
     RECEIPT_KEY,
     ReceiptClose,
-    ReceiptCloseDecorator,
     ReceiptCloseInfo,
-    calculate_cost,
-    default_info,
+    calculate_cost, get_info,
 )
+from finalproject.service.receipt_close.receipt_close_decorator import ReceiptCloseDecorator
 
 
 class ReceiptDiscountDecorator(ReceiptCloseDecorator):
@@ -19,10 +18,15 @@ class ReceiptDiscountDecorator(ReceiptCloseDecorator):
         super().__init__(receipt_close)
         self._receipt_discount = receipt_discount
 
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = default_info()) -> float:
+    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> float:
+        info = get_info(info)
+
         current_total = calculate_cost(receipt, info)
 
         if current_total >= self._receipt_discount.minimum_total:
-            info.discounts[RECEIPT_KEY] *= self._receipt_discount.discount
+            info.discounts[RECEIPT_KEY] = min(
+                info.discounts[RECEIPT_KEY],
+                1 - self._receipt_discount.discount
+            )
 
         return self._receipt_close.close(receipt, info)

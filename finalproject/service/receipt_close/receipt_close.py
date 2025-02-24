@@ -15,10 +15,12 @@ class ReceiptCloseInfo:
     combo_discounts: defaultdict[str, list[tuple[float, int]]]
 
 
-def default_info() -> ReceiptCloseInfo:
-    return ReceiptCloseInfo(
-        defaultdict(lambda: 1.0), defaultdict(lambda: 0), defaultdict(lambda: [])
-    )
+def get_info(info: ReceiptCloseInfo) -> ReceiptCloseInfo:
+    if info is None:
+        return ReceiptCloseInfo(
+            defaultdict(lambda: 1.0), defaultdict(lambda: 0), defaultdict(lambda: [])
+        )
+    return info
 
 
 def calculate_cost(receipt: Receipt, info: ReceiptCloseInfo) -> float:
@@ -40,5 +42,5 @@ def calculate_cost(receipt: Receipt, info: ReceiptCloseInfo) -> float:
 
 
 class ReceiptClose(Protocol):
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = default_info()) -> float:
+    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> float:
         pass

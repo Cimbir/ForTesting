@@ -5,10 +5,9 @@ from finalproject.models.models import Receipt, ReceiptItem
 from finalproject.models.product import Product
 from finalproject.service.receipt_close.receipt_close import (
     ReceiptClose,
-    ReceiptCloseDecorator,
-    ReceiptCloseInfo,
-    default_info,
+    ReceiptCloseInfo, get_info,
 )
+from finalproject.service.receipt_close.receipt_close_decorator import ReceiptCloseDecorator
 
 
 class BuyNGetNDecorator(ReceiptCloseDecorator):
@@ -22,7 +21,9 @@ class BuyNGetNDecorator(ReceiptCloseDecorator):
         self._buy_n_get_n = buy_n_get_n
         self._product = product
 
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = default_info()) -> float:
+    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> float:
+        info = get_info(info)
+
         buy_n = 0
         for item in receipt.items:
             if item.product_id == self._buy_n_get_n.buy_product_id:

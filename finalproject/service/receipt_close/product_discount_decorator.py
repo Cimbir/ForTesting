@@ -2,10 +2,10 @@ from finalproject.models.campaigns import ProductDiscount
 from finalproject.models.models import Receipt
 from finalproject.service.receipt_close.receipt_close import (
     ReceiptClose,
-    ReceiptCloseDecorator,
     ReceiptCloseInfo,
-    default_info,
+    get_info
 )
+from finalproject.service.receipt_close.receipt_close_decorator import ReceiptCloseDecorator
 
 
 class ProductDiscountDecorator(ReceiptCloseDecorator):
@@ -17,9 +17,11 @@ class ProductDiscountDecorator(ReceiptCloseDecorator):
         super().__init__(receipt_close)
         self._product_discount = product_discount
 
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = default_info()) -> float:
+    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> float:
+        info = get_info(info)
+
         info.discounts[self._product_discount.product_id] *= (
-            self._product_discount.discount
+            1 - self._product_discount.discount
         )
 
         return self._receipt_close.close(receipt, info)

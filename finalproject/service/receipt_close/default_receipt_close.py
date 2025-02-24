@@ -3,10 +3,11 @@ from finalproject.service.receipt_close.receipt_close import (
     ReceiptClose,
     ReceiptCloseInfo,
     calculate_cost,
-    default_info,
+    get_info
 )
 
 
 class DefaultReceiptClose(ReceiptClose):
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = default_info()) -> float:
+    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> float:
+        info = get_info(info)
         return calculate_cost(receipt, info)
