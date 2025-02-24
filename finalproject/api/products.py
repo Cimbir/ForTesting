@@ -1,10 +1,13 @@
 from typing import Protocol
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.requests import Request
 from pydantic import BaseModel
 
-from finalproject.store.product import ProductRecord, ProductStore
+from finalproject.models.product import Product
+from finalproject.service.products import ProductService
+from finalproject.store.product import ProductStore
+from finalproject.store.store import RecordAlreadyExists, RecordNotFound
 
 products_api = APIRouter()
 
@@ -13,29 +16,23 @@ class _Distributor(Protocol):
     def products(self) -> ProductStore:
         pass
 
-
-class ProductResponse(BaseModel):
-    id: str
+class ProductRequest(BaseModel):
     name: str
     price: float
 
 
 class SingleProductResponse(BaseModel):
-    product: ProductResponse
+    product: Product
 
 
 class ListProductsResponse(BaseModel):
-    products: list[ProductResponse]
+    products: list[Product]
 
 
-def get_product_store(request: Request) -> ProductStore:
+def get_product_service(request: Request) -> ProductService:
     distributor: _Distributor = request.app.state.distributor
 
-    return distributor.products()
-
-
-def get_product_response(product: ProductRecord) -> ProductResponse:
-    return ProductResponse(id=product.id, name=product.name, price=product.price)
+    return ProductService(distributor.products())
 
 
 @products_api.get(
@@ -44,9 +41,56 @@ def get_product_response(product: ProductRecord) -> ProductResponse:
     response_model=ListProductsResponse,
 )
 def list_products(
-    product_store: ProductStore = Depends(get_product_store),
+    product_service: ProductService = Depends(get_product_service),
 ) -> ListProductsResponse:
-    products = product_store.list_all()
-    return ListProductsResponse(
-        products=[get_product_response(product) for product in products]
-    )
+    products = product_service.get_all_products()
+    return ListProductsResponse(products=products)
+
+@products_api.post(
+    "",
+    status_code=201,
+    response_model=SingleProductResponse,
+)
+def add_product(
+    product_request: ProductRequest,
+    product_service: ProductService = Depends(get_product_service),
+) -> SingleProductResponse:
+    product = Product(id='', name=product_request.name, price=product_request.price)
+    try:
+        product_service.add_product(product)
+    except RecordAlreadyExists:
+        raise HTTPException(status_code=409, detail="Product already exists")
+    return SingleProductResponse(product=product)
+
+@products_api.get(
+    "/{product_id}",
+    status_code=200,
+    response_model=SingleProductResponse,
+)
+def get_product(
+    product_id: str,
+    product_service: ProductService = Depends(get_product_service),
+) -> SingleProductResponse:
+    try:
+        product = product_service.get_product(product_id)
+    except RecordNotFound:
+        raise HTTPException(status_code=404, detail=f"Product with id={product_id} not found")
+    return SingleProductResponse(product=product)
+
+@products_api.patch(
+    "/{product_id}",
+    status_code=200,
+    response_model=SingleProductResponse,
+)
+def update_product(
+    product_id: str,
+    product_request: ProductRequest,
+    product_service: ProductService = Depends(get_product_service),
+) -> SingleProductResponse:
+    product = Product(id=product_id, name=product_request.name, price=product_request.price)
+    try:
+        product_service.update_product(product)
+    except RecordNotFound:
+        raise HTTPException(status_code=404, detail=f"Product with id={product_id} not found")
+    return SingleProductResponse(product=product
+)
