@@ -13,6 +13,7 @@ from finalproject.store.store import (
 @dataclass(frozen=True)
 class ComboItemRecord(Record):
     id: str
+    combo_id: str
     product_id: str
     quantity: int
 
@@ -34,6 +35,7 @@ class ComboItemSQLiteStore(SQLRemovableStore[ComboItemRecord]):
             f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 id TEXT PRIMARY KEY,
+                combo_id TEXT,
                 product_id TEXT,
                 quantity INTEGER
             );
@@ -41,8 +43,8 @@ class ComboItemSQLiteStore(SQLRemovableStore[ComboItemRecord]):
         )
         self._conn.commit()
 
-    def _record_to_row(self, record: ComboItemRecord) -> tuple[str, str, int]:
-        return record.id, record.product_id, record.quantity
+    def _record_to_row(self, record: ComboItemRecord) -> tuple[str, str, str, int]:
+        return record.id, record.combo_id, record.product_id, record.quantity
 
-    def _row_to_record(self, row: tuple[str, str, int]) -> ComboItemRecord:
+    def _row_to_record(self, row: tuple[str, str, str, int]) -> ComboItemRecord:
         return ComboItemRecord(*row)

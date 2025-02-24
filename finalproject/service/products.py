@@ -3,6 +3,7 @@ from typing import List
 from finalproject.models.product import Product
 from finalproject.service.store_utils import generate_id
 from finalproject.store.product import ProductStore
+from finalproject.store.store import RecordNotFound
 
 
 class ProductService:
@@ -15,7 +16,10 @@ class ProductService:
         return product
 
     def get_product(self, product_id: str) -> Product:
-        product_record = self.product_store.get_by_id(product_id)
+        try:
+            product_record = self.product_store.get_by_id(product_id)
+        except RecordNotFound:
+            raise ProductNotFound(product_id)
         return Product.from_record(product_record)
 
     def get_all_products(self) -> List[Product]:

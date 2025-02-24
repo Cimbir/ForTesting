@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Protocol, Sequence
 
 from finalproject.store.receipt import ReceiptRecord
 from finalproject.store.receipt_item import ReceiptItemRecord
@@ -8,8 +8,16 @@ from finalproject.store.receipt_item import ReceiptItemRecord
 class Model(Protocol):
     id: str
 
+    def compare_without_id(self, other: "Model") -> bool:
+        without_id = {k: v for k, v in self.__dict__.items() if k != "id"}
+        other_without_id = {k: v for k, v in other.__dict__.items() if k != "id"}
+        return without_id == other_without_id
 
-@dataclass(frozen=True)
+    def in_list_without_id(self, others: Sequence["Model"]) -> bool:
+        return any(self.compare_without_id(other) for other in others)
+
+
+@dataclass
 class ReceiptItem(Model):
     id: str
     product_id: str
@@ -35,7 +43,7 @@ class ReceiptItem(Model):
         )
 
 
-@dataclass(frozen=True)
+@dataclass
 class Receipt(Model):
     id: str
     open: bool
@@ -60,3 +68,16 @@ class Receipt(Model):
             shift_id=record.shift_id,
             items=items,
         )
+
+    def compare_without_id_and_items_id(self, other: "Receipt") -> bool:
+        items_are_same = all(
+            self_item.compare_without_id(other_item)
+            for self_item, other_item in zip(self.items, other.items)
+        )
+        without_list = {
+            k: v for k, v in self.__dict__.items() if k not in ["id", "items"]
+        }
+        other_without_list = {
+            k: v for k, v in other.__dict__.items() if k not in ["id", "items"]
+        }
+        return without_list == other_without_list and items_are_same
