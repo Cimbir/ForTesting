@@ -3,8 +3,7 @@ from dataclasses import dataclass
 from finalproject.models.models import Model
 from finalproject.store.product import ProductRecord
 
-
-@dataclass(frozen=True)
+@dataclass
 class Product(Model):
     id: str
     name: str

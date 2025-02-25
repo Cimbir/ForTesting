@@ -86,9 +86,10 @@ class ComboItem(Model):
     product_id: str
     quantity: int
 
-    def to_record(self) -> ComboItemRecord:
+    def to_record(self, combo_id: str) -> ComboItemRecord:
         return ComboItemRecord(
             id=self.id,
+            combo_id=combo_id,
             product_id=self.product_id,
             quantity=self.quantity,
         )
@@ -124,3 +125,16 @@ class Combo(Model):
             discount=record.discount,
             items=items,
         )
+
+    def compare_without_id_and_items_id(self, other: "Combo") -> bool:
+        items_are_same = all(
+            self_item.compare_without_id(other_item)
+            for self_item, other_item in zip(self.items, other.items)
+        )
+        without_list = {
+            k: v for k, v in self.__dict__.items() if k not in ["id", "items"]
+        }
+        other_without_list = {
+            k: v for k, v in other.__dict__.items() if k not in ["id", "items"]
+        }
+        return without_list == other_without_list and items_are_same
