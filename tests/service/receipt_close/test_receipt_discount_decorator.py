@@ -11,7 +11,7 @@ def test_should_return_zero_on_empty_receipt(def_rec_close: DefaultReceiptClose)
         discount=0.1,
         minimum_total=10.0
     ))
-    assert rec_discount.close(get_receipt([])) == 0.0
+    assert rec_discount.close(get_receipt([])).price == 0.0
 
 def test_should_discount_receipt(def_rec_close: DefaultReceiptClose) -> None:
     rec_discount = ReceiptDiscountDecorator(def_rec_close, ReceiptDiscount(
@@ -26,7 +26,7 @@ def test_should_discount_receipt(def_rec_close: DefaultReceiptClose) -> None:
             quantity=1,
             price=10.0
         )
-    ])) == 9.0
+    ])).price == 9.0
 
 def test_should_not_discount_because_lower_than_main(def_rec_close: DefaultReceiptClose) -> None:
     rec_discount = ReceiptDiscountDecorator(def_rec_close, ReceiptDiscount(
@@ -41,7 +41,7 @@ def test_should_not_discount_because_lower_than_main(def_rec_close: DefaultRecei
             quantity=1,
             price=9.0
         )
-    ])) == 9.0
+    ])).price == 9.0
 
 def test_should_discount_multiple_products(def_rec_close: DefaultReceiptClose) -> None:
     rec_discount = ReceiptDiscountDecorator(def_rec_close, ReceiptDiscount(
@@ -62,7 +62,7 @@ def test_should_discount_multiple_products(def_rec_close: DefaultReceiptClose) -
             quantity=1,
             price=12.0
         )
-    ])) == (7.0 + 12.0) * 0.9
+    ])).price == (7.0 + 12.0) * 0.9
 
 def test_should_not_discount_if_total_lower_than_main(def_rec_close: DefaultReceiptClose) -> None:
     rec_discount = ReceiptDiscountDecorator(def_rec_close, ReceiptDiscount(
@@ -83,7 +83,7 @@ def test_should_not_discount_if_total_lower_than_main(def_rec_close: DefaultRece
             quantity=1,
             price=5.0
         )
-    ])) == 9.0
+    ])).price == 9.0
 
 def test_should_choose_the_only_discount_that_fits(def_rec_close: DefaultReceiptClose) -> None:
     rec_discount = ReceiptDiscountDecorator(def_rec_close, ReceiptDiscount(
@@ -109,7 +109,7 @@ def test_should_choose_the_only_discount_that_fits(def_rec_close: DefaultReceipt
             quantity=1,
             price=10.0
         )
-    ])) == (3.0 + 10.0) * 0.9
+    ])).price == (3.0 + 10.0) * 0.9
 
 def test_should_choose_the_best_discount(def_rec_close: DefaultReceiptClose) -> None:
     rec_discount = ReceiptDiscountDecorator(def_rec_close, ReceiptDiscount(
@@ -135,4 +135,4 @@ def test_should_choose_the_best_discount(def_rec_close: DefaultReceiptClose) -> 
             quantity=1,
             price=10.0
         )
-    ])) == (13.0 + 10.0) * 0.8
+    ])).price == (13.0 + 10.0) * 0.8

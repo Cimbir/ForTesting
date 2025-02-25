@@ -3,7 +3,7 @@ from finalproject.models.models import Receipt
 from finalproject.service.receipt_close.receipt_close import (
     ReceiptClose,
     ReceiptCloseInfo,
-    get_info
+    get_info, ReceiptCloseResult
 )
 from finalproject.service.receipt_close.receipt_close_decorator import ReceiptCloseDecorator
 
@@ -17,7 +17,7 @@ class ProductDiscountDecorator(ReceiptCloseDecorator):
         super().__init__(receipt_close)
         self._product_discount = product_discount
 
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> float:
+    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> ReceiptCloseResult:
         info = get_info(info)
 
         info.discounts[self._product_discount.product_id] *= (

@@ -3,7 +3,7 @@ from finalproject.models.models import Receipt, ReceiptItem
 from finalproject.service.receipt_close.receipt_close import (
     ReceiptClose,
     ReceiptCloseInfo,
-    get_info,
+    get_info, ReceiptCloseResult,
 )
 from finalproject.service.receipt_close.receipt_close_decorator import ReceiptCloseDecorator
 
@@ -16,10 +16,9 @@ class ComboDecorator(ReceiptCloseDecorator):
         self._combo = combo
 
     def _get_left_for_combo(self, item: ReceiptItem, info: ReceiptCloseInfo) -> int:
-        left = item.quantity - info.free_items[item.product_id]
         for combo_discount in info.combo_discounts[item.product_id]:
-            left -= combo_discount[1]
-        return left
+            return item.quantity - combo_discount[1]
+        return item.quantity
 
     def _amount_satisfies_combo_item(
         self, combo_item: ComboItem, receipt: Receipt, info: ReceiptCloseInfo
@@ -32,7 +31,7 @@ class ComboDecorator(ReceiptCloseDecorator):
                 return self._get_left_for_combo(item, info) // combo_item.quantity
         return 0
 
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> float:
+    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> ReceiptCloseResult:
         info = get_info(info)
 
         combo_satisfied_amount = float("inf")

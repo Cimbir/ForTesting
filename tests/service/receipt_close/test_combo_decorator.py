@@ -12,7 +12,7 @@ def test_should_return_zero_when_no_items(def_rec_close: DefaultReceiptClose) ->
         discount=0.1,
         items=[]
     ))
-    assert combo.close(get_receipt([])) == 0.0
+    assert combo.close(get_receipt([])).price == 0.0
 
 def test_should_discount_combo(def_rec_close: DefaultReceiptClose) -> None:
     combo = ComboDecorator(def_rec_close, Combo(
@@ -35,7 +35,7 @@ def test_should_discount_combo(def_rec_close: DefaultReceiptClose) -> None:
             quantity=1,
             price=1.0
         )
-    ])) == 0.9
+    ])).price == 0.9
 
 def test_should_not_discount_combo_when_not_enough_items(def_rec_close: DefaultReceiptClose) -> None:
     combo = ComboDecorator(def_rec_close, Combo(
@@ -58,7 +58,7 @@ def test_should_not_discount_combo_when_not_enough_items(def_rec_close: DefaultR
             quantity=1,
             price=1.0
         )
-    ])) == 1.0
+    ])).price == 1.0
 
 def test_should_discount_combo_only_combo_item(def_rec_close: DefaultReceiptClose) -> None:
     combo = ComboDecorator(def_rec_close, Combo(
@@ -87,7 +87,7 @@ def test_should_discount_combo_only_combo_item(def_rec_close: DefaultReceiptClos
             quantity=1,
             price=2.0
         )
-    ])) == 1.0 * 0.9 + 2.0
+    ])).price == 1.0 * 0.9 + 2.0
 
 def test_should_only_discount_combo_part_of_receipt_item(def_rec_close: DefaultReceiptClose) -> None:
     combo = ComboDecorator(def_rec_close, Combo(
@@ -109,7 +109,7 @@ def test_should_only_discount_combo_part_of_receipt_item(def_rec_close: DefaultR
             quantity=3,
             price=1.0
         )
-    ])) == 2.0 * 0.9 + 1.0
+    ])).price == 2.0 * 0.9 + 1.0
 
 def test_should_discount_multiple_same_combos(def_rec_close: DefaultReceiptClose) -> None:
     combo = ComboDecorator(def_rec_close, Combo(
@@ -131,7 +131,7 @@ def test_should_discount_multiple_same_combos(def_rec_close: DefaultReceiptClose
             quantity=4,
             price=1.0
         )
-    ])) == 4.0 * 0.9
+    ])).price == 4.0 * 0.9
 
 def test_should_discount_combo_with_multiple_items(def_rec_close: DefaultReceiptClose) -> None:
     combo = ComboDecorator(def_rec_close, Combo(
@@ -170,7 +170,7 @@ def test_should_discount_combo_with_multiple_items(def_rec_close: DefaultReceipt
             quantity=1,
             price=3.0
         )
-    ])) == (1.0 + 2.0) * 0.9 + 3.0
+    ])).price == (1.0 + 2.0) * 0.9 + 3.0
 
 def test_should_discount_with_multiple_different_combos(def_rec_close: DefaultReceiptClose) -> None:
     combo = ComboDecorator(def_rec_close, Combo(
@@ -216,7 +216,7 @@ def test_should_discount_with_multiple_different_combos(def_rec_close: DefaultRe
             quantity=1,
             price=3.0
         )
-    ])) == (1.0 * 0.9) + (2.0 * 0.8) + 3.0
+    ])).price == (1.0 * 0.9) + (2.0 * 0.8) + 3.0
 
 def test_should_only_discount_one_combo_because_overlapping_items(def_rec_close: DefaultReceiptClose) -> None:
     combo = ComboDecorator(def_rec_close, Combo(
@@ -256,4 +256,4 @@ def test_should_only_discount_one_combo_because_overlapping_items(def_rec_close:
             quantity=1,
             price=2.0
         ),
-    ])) == (2.0 * 0.9) + 2.0
+    ])).price == (2.0 * 0.9) + 2.0

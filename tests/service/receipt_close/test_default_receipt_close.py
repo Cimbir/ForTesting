@@ -4,7 +4,7 @@ from tests.service.receipt_close.utils import get_receipt
 
 
 def test_should_return_zero_when_no_items_in_receipt(def_rec_close: DefaultReceiptClose) -> None:
-    assert def_rec_close.close(receipt=get_receipt([])) == 0.0
+    assert def_rec_close.close(receipt=get_receipt([])).price == 0.0
 
 def test_should_return_sum_of_item_costs(def_rec_close: DefaultReceiptClose) -> None:
     receipt = get_receipt([
@@ -27,7 +27,7 @@ def test_should_return_sum_of_item_costs(def_rec_close: DefaultReceiptClose) -> 
             price=3.0
         )
     ])
-    assert def_rec_close.close(receipt=receipt) == 1.0 + 2.0 + 3.0
+    assert def_rec_close.close(receipt=receipt).price == 1.0 + 2.0 + 3.0
 
 def test_should_return_sum_of_item_costs_with_multiple_quantities(def_rec_close: DefaultReceiptClose) -> None:
     receipt = get_receipt([
@@ -50,11 +50,11 @@ def test_should_return_sum_of_item_costs_with_multiple_quantities(def_rec_close:
             price=3.0
         )
     ])
-    assert def_rec_close.close(receipt=receipt) == 2 * 1.0 + 3 * 2.0 + 4 * 3.0
+    assert def_rec_close.close(receipt=receipt).price == 2 * 1.0 + 3 * 2.0 + 4 * 3.0
 
 def test_should_handle_multiple_calls(def_rec_close: DefaultReceiptClose) -> None:
-    assert def_rec_close.close(receipt=get_receipt([])) == 0.0
-    assert def_rec_close.close(receipt=get_receipt([])) == 0.0
+    assert def_rec_close.close(receipt=get_receipt([])).price == 0.0
+    assert def_rec_close.close(receipt=get_receipt([])).price == 0.0
     assert def_rec_close.close(receipt=get_receipt([
         ReceiptItem(
             id="1",
@@ -62,7 +62,7 @@ def test_should_handle_multiple_calls(def_rec_close: DefaultReceiptClose) -> Non
             quantity=1,
             price=1.0
         )
-    ])) == 1.0
+    ])).price == 1.0
     assert def_rec_close.close(receipt=get_receipt([
         ReceiptItem(
             id="1",
@@ -70,4 +70,4 @@ def test_should_handle_multiple_calls(def_rec_close: DefaultReceiptClose) -> Non
             quantity=1,
             price=1.0
         )
-    ])) == 1.0
+    ])).price == 1.0

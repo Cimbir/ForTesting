@@ -11,9 +11,13 @@ RECEIPT_KEY = "receipt"
 @dataclass
 class ReceiptCloseInfo:
     discounts: defaultdict[str, float]
-    free_items: defaultdict[str, int]
+    added_products: defaultdict[str, int]
     combo_discounts: defaultdict[str, list[tuple[float, int]]]
 
+@dataclass
+class ReceiptCloseResult:
+    price: float
+    added_products: defaultdict[str, int]
 
 def get_info(info: ReceiptCloseInfo) -> ReceiptCloseInfo:
     if info is None:
@@ -26,7 +30,7 @@ def get_info(info: ReceiptCloseInfo) -> ReceiptCloseInfo:
 def calculate_cost(receipt: Receipt, info: ReceiptCloseInfo) -> float:
     total = 0
     for item in receipt.items:
-        paid_amount = item.quantity - info.free_items[item.product_id]
+        paid_amount = item.quantity
         fit_combos = info.combo_discounts[item.product_id]
 
         item_cost = 0
@@ -42,5 +46,5 @@ def calculate_cost(receipt: Receipt, info: ReceiptCloseInfo) -> float:
 
 
 class ReceiptClose(Protocol):
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> float:
+    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> ReceiptCloseResult:
         pass

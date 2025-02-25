@@ -11,7 +11,7 @@ def test_should_return_zero_when_no_items(def_rec_close: DefaultReceiptClose) ->
         product_id="1",
         discount=0.1
     ))
-    assert prod_discount.close(get_receipt([])) == 0.0
+    assert prod_discount.close(get_receipt([])).price == 0.0
 
 def test_should_discount_product(def_rec_close: DefaultReceiptClose) -> None:
     prod_discount = ProductDiscountDecorator(def_rec_close, ProductDiscount(
@@ -26,7 +26,7 @@ def test_should_discount_product(def_rec_close: DefaultReceiptClose) -> None:
             quantity=1,
             price=1.0
         )
-    ])) == 0.9
+    ])).price == 0.9
     assert prod_discount.close(get_receipt([
         ReceiptItem(
             id="1",
@@ -34,7 +34,7 @@ def test_should_discount_product(def_rec_close: DefaultReceiptClose) -> None:
             quantity=2,
             price=1.0
         )
-    ])) == 1.8
+    ])).price == 1.8
 
 def test_should_discount_one_in_multiple_products(def_rec_close: DefaultReceiptClose) -> None:
     prod_discount = ProductDiscountDecorator(def_rec_close, ProductDiscount(
@@ -55,7 +55,7 @@ def test_should_discount_one_in_multiple_products(def_rec_close: DefaultReceiptC
             quantity=1,
             price=2.0
         )
-    ])) == 1.0 + 1.8
+    ])).price == 1.0 + 1.8
 
 def test_should_not_discount_if_product_not_in_receipt(def_rec_close: DefaultReceiptClose) -> None:
     prod_discount = ProductDiscountDecorator(def_rec_close, ProductDiscount(
@@ -70,7 +70,7 @@ def test_should_not_discount_if_product_not_in_receipt(def_rec_close: DefaultRec
             quantity=1,
             price=1.0
         )
-    ])) == 1.0
+    ])).price == 1.0
 
 def test_should_discount_multiple_products(def_rec_close: DefaultReceiptClose) -> None:
     prod_discount = ProductDiscountDecorator(def_rec_close, ProductDiscount(
@@ -96,7 +96,7 @@ def test_should_discount_multiple_products(def_rec_close: DefaultReceiptClose) -
             quantity=1,
             price=2.0
         )
-    ])) == 0.9 + 1.6
+    ])).price == 0.9 + 1.6
 
 def test_should_discount_same_product_multiple_times(def_rec_close: DefaultReceiptClose) -> None:
     prod_discount = ProductDiscountDecorator(def_rec_close, ProductDiscount(
@@ -116,4 +116,4 @@ def test_should_discount_same_product_multiple_times(def_rec_close: DefaultRecei
             quantity=2,
             price=1.0
         ),
-    ])) == 2 * 0.9 * 0.8
+    ])).price == 2 * 0.9 * 0.8
