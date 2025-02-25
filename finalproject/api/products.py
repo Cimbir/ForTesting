@@ -8,7 +8,6 @@ from finalproject.models.product import Product
 from finalproject.service.exceptions import ProductNotFound
 from finalproject.service.products import ProductService
 from finalproject.store.product import ProductStore
-from finalproject.store.store import RecordAlreadyExists, RecordNotFound
 
 products_api = APIRouter()
 
@@ -90,5 +89,4 @@ def update_product(
         product_service.update_product(product)
     except ProductNotFound:
         raise HTTPException(status_code=404, detail=f"Product with id={product_id} not found")
-    return SingleProductResponse(product=product
-)
+    return SingleProductResponse(product=product)

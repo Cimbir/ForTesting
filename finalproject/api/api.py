@@ -6,6 +6,7 @@ from apexdevkit.server import UvicornServer
 from fastapi import FastAPI
 from starlette.testclient import TestClient
 
+from finalproject.api.campaigns import campaigns_api
 from finalproject.api.products import products_api
 
 
@@ -26,6 +27,9 @@ class APIUsingFastAPI:
     def _register_routes(self) -> None:
         self._fast_api.include_router(
             products_api, prefix="/products", tags=["Products"]
+        )
+        self._fast_api.include_router(
+            campaigns_api, prefix="/campaigns", tags=["Campaigns"]
         )
 
     def run(self) -> None:
