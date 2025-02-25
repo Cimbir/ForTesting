@@ -4,9 +4,13 @@ from finalproject.service.receipt_close.receipt_close import (
     RECEIPT_KEY,
     ReceiptClose,
     ReceiptCloseInfo,
-    calculate_cost, get_info, ReceiptCloseResult,
+    ReceiptCloseResult,
+    calculate_cost,
+    get_info,
 )
-from finalproject.service.receipt_close.receipt_close_decorator import ReceiptCloseDecorator
+from finalproject.service.receipt_close.receipt_close_decorator import (
+    ReceiptCloseDecorator,
+)
 
 
 class ReceiptDiscountDecorator(ReceiptCloseDecorator):
@@ -18,15 +22,16 @@ class ReceiptDiscountDecorator(ReceiptCloseDecorator):
         super().__init__(receipt_close)
         self._receipt_discount = receipt_discount
 
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> ReceiptCloseResult:
-        info = get_info(info)
+    def close(
+        self, receipt: Receipt, info: ReceiptCloseInfo | None = None
+    ) -> ReceiptCloseResult:
+        _info = get_info(info)
 
-        current_total = calculate_cost(receipt, info)
+        current_total = calculate_cost(receipt, _info)
 
         if current_total >= self._receipt_discount.minimum_total:
-            info.discounts[RECEIPT_KEY] = min(
-                info.discounts[RECEIPT_KEY],
-                1 - self._receipt_discount.discount
+            _info.discounts[RECEIPT_KEY] = min(
+                _info.discounts[RECEIPT_KEY], 1 - self._receipt_discount.discount
             )
 
-        return self._receipt_close.close(receipt, info)
+        return self._receipt_close.close(receipt, _info)

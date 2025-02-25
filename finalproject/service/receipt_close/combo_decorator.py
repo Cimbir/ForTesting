@@ -3,9 +3,12 @@ from finalproject.models.models import Receipt, ReceiptItem
 from finalproject.service.receipt_close.receipt_close import (
     ReceiptClose,
     ReceiptCloseInfo,
-    get_info, ReceiptCloseResult,
+    ReceiptCloseResult,
+    get_info,
 )
-from finalproject.service.receipt_close.receipt_close_decorator import ReceiptCloseDecorator
+from finalproject.service.receipt_close.receipt_close_decorator import (
+    ReceiptCloseDecorator,
+)
 
 
 class ComboDecorator(ReceiptCloseDecorator):
@@ -31,20 +34,25 @@ class ComboDecorator(ReceiptCloseDecorator):
                 return self._get_left_for_combo(item, info) // combo_item.quantity
         return 0
 
-    def close(self, receipt: Receipt, info: ReceiptCloseInfo = None) -> ReceiptCloseResult:
-        info = get_info(info)
+    def close(
+        self, receipt: Receipt, info: ReceiptCloseInfo | None = None
+    ) -> ReceiptCloseResult:
+        _info = get_info(info)
 
         combo_satisfied_amount = float("inf")
         for combo_item in self._combo.items:
             combo_satisfied_amount = min(
                 combo_satisfied_amount,
-                self._amount_satisfies_combo_item(combo_item, receipt, info),
+                self._amount_satisfies_combo_item(combo_item, receipt, _info),
             )
 
         if combo_satisfied_amount > 0:
             for combo_item in self._combo.items:
-                info.combo_discounts[combo_item.product_id].append(
-                    (1 - self._combo.discount, combo_item.quantity * combo_satisfied_amount)
+                _info.combo_discounts[combo_item.product_id].append(
+                    (
+                        1 - self._combo.discount,
+                        combo_item.quantity * int(combo_satisfied_amount),
+                    )
                 )
 
-        return self._receipt_close.close(receipt, info)
+        return self._receipt_close.close(receipt, _info)
