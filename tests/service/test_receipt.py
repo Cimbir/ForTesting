@@ -14,7 +14,7 @@ from finalproject.store.paid_receipt import PaidReceiptStore
 
 
 def test_should_add_and_get_empty_receipt(receipt_service: ReceiptService) -> None:
-    receipt = Receipt(id="", open=True, items=[], shift_id="1")
+    receipt = Receipt(shift_id="1")
     receipt_response = receipt_service.add_receipt(receipt)
     assert receipt_response.compare_without_id(receipt)
     assert receipt_service.get_receipt(receipt_response.id).compare_without_id(receipt)
@@ -22,11 +22,9 @@ def test_should_add_and_get_empty_receipt(receipt_service: ReceiptService) -> No
 
 def test_should_add_receipt_with_items(receipt_service: ReceiptService) -> None:
     receipt = Receipt(
-        id="",
-        open=True,
         items=[
-            ReceiptItem(id="", product_id="1", quantity=1, price=1.0),
-            ReceiptItem(id="", product_id="2", quantity=2, price=2.0),
+            ReceiptItem(product_id="1", quantity=1, price=1.0),
+            ReceiptItem(product_id="2", quantity=2, price=2.0),
         ],
         shift_id="1",
     )
@@ -38,13 +36,11 @@ def test_should_add_receipt_with_items(receipt_service: ReceiptService) -> None:
 def test_should_get_all_receipts(receipt_service: ReceiptService) -> None:
     assert len(receipt_service.get_all_receipts()) == 0
 
-    receipt_1 = Receipt(id="1", open=True, items=[], shift_id="1")
+    receipt_1 = Receipt(shift_id="1")
     receipt_2 = Receipt(
-        id="2",
-        open=True,
         items=[
-            ReceiptItem(id="", product_id="1", quantity=1, price=1.0),
-            ReceiptItem(id="", product_id="2", quantity=2, price=2.0),
+            ReceiptItem(product_id="1", quantity=1, price=1.0),
+            ReceiptItem(product_id="2", quantity=2, price=2.0),
         ],
         shift_id="1",
     )
@@ -70,9 +66,7 @@ def test_should_close_receipt(
 ) -> None:
     receipt = receipt_service.add_receipt(
         Receipt(
-            id="",
-            open=True,
-            items=[ReceiptItem(id="", product_id="1", quantity=1, price=1.0)],
+            items=[ReceiptItem(product_id="1", quantity=1, price=1.0)],
             shift_id="1",
         )
     )
@@ -86,15 +80,15 @@ def test_should_close_receipt(
 def test_raise_receipt_not_found_on_closing_non_existent_receipt(
     receipt_service: ReceiptService,
 ) -> None:
-    receipt_service.add_receipt(Receipt(id="1", open=True, items=[], shift_id="1"))
+    receipt_service.add_receipt(Receipt(shift_id="1"))
     pytest.raises(ReceiptNotFound, receipt_service.close_receipt, "2", "")
 
 
 def test_should_add_item_to_receipt(receipt_service: ReceiptService) -> None:
     receipt = receipt_service.add_receipt(
-        Receipt(id="1", open=True, items=[], shift_id="1")
+        Receipt(shift_id="1")
     )
-    item = ReceiptItem(id="", product_id="1", quantity=1, price=1.0)
+    item = ReceiptItem(product_id="1", quantity=1, price=1.0)
 
     receipt = receipt_service.update_product_in_receipt(
         receipt_id=receipt.id, product_id=item.product_id, quantity=item.quantity
@@ -107,7 +101,7 @@ def test_should_add_item_to_receipt(receipt_service: ReceiptService) -> None:
 def test_should_raise_receipt_not_found_when_adding_item_to_non_existent_receipt(
     receipt_service: ReceiptService,
 ) -> None:
-    item = ReceiptItem(id="", product_id="1", quantity=1, price=1.0)
+    item = ReceiptItem(product_id="1", quantity=1, price=1.0)
     pytest.raises(
         ReceiptNotFound,
         receipt_service.update_product_in_receipt,
@@ -121,10 +115,10 @@ def test_should_raise_product_not_found_when_adding_item_with_non_existent_produ
     receipt_service: ReceiptService,
 ) -> None:
     receipt = receipt_service.add_receipt(
-        Receipt(id="1", open=True, items=[], shift_id="1")
+        Receipt(shift_id="1")
     )
 
-    item = ReceiptItem(id="", product_id="3", quantity=1, price=1.0)
+    item = ReceiptItem(product_id="3", quantity=1, price=1.0)
     pytest.raises(
         ProductNotFound,
         receipt_service.update_product_in_receipt,
@@ -137,9 +131,7 @@ def test_should_raise_product_not_found_when_adding_item_with_non_existent_produ
 def test_should_update_item_in_receipt(receipt_service: ReceiptService) -> None:
     receipt = receipt_service.add_receipt(
         Receipt(
-            id="",
-            open=True,
-            items=[ReceiptItem(id="", product_id="1", quantity=1, price=1.0)],
+            items=[ReceiptItem(product_id="1", quantity=1, price=1.0)],
             shift_id="1",
         )
     )
@@ -151,9 +143,7 @@ def test_should_update_item_in_receipt(receipt_service: ReceiptService) -> None:
     )
 
     compare_receipt = Receipt(
-        id="",
-        open=True,
-        items=[ReceiptItem(id="", product_id="1", quantity=3, price=1.0)],
+        items=[ReceiptItem(product_id="1", quantity=3, price=1.0)],
         shift_id="1",
     )
 
@@ -165,9 +155,7 @@ def test_should_update_item_in_receipt(receipt_service: ReceiptService) -> None:
 def test_should_remove_item_from_receipt(receipt_service: ReceiptService) -> None:
     receipt = receipt_service.add_receipt(
         Receipt(
-            id="",
-            open=True,
-            items=[ReceiptItem(id="", product_id="1", quantity=1, price=1.0)],
+            items=[ReceiptItem(product_id="1", quantity=1, price=1.0)],
             shift_id="1",
         )
     )
@@ -175,12 +163,7 @@ def test_should_remove_item_from_receipt(receipt_service: ReceiptService) -> Non
     receipt_service.remove_product_from_receipt(receipt.id, receipt.items[0].product_id)
 
     assert receipt_service.get_receipt(receipt.id).compare_without_id(
-        Receipt(
-            id="0",
-            open=True,
-            items=[],
-            shift_id="1",
-        )
+        Receipt(shift_id="1")
     )
 
 
@@ -188,7 +171,7 @@ def test_should_raise_receipt_item_not_found_when_removing_non_existent_item(
     receipt_service: ReceiptService,
 ) -> None:
     receipt = receipt_service.add_receipt(
-        Receipt(id="", open=True, items=[], shift_id="1")
+        Receipt(shift_id="1")
     )
     pytest.raises(
         ReceiptItemNotFound,
@@ -200,17 +183,10 @@ def test_should_raise_receipt_item_not_found_when_removing_non_existent_item(
 
 def test_should_get_receipts_by_shift_id(receipt_service: ReceiptService) -> None:
     receipt1 = Receipt(
-        id="",
-        open=True,
-        items=[ReceiptItem(id="", product_id="1", quantity=1, price=1.0)],
+        items=[ReceiptItem(product_id="1", quantity=1, price=1.0)],
         shift_id="1",
     )
-    receipt2 = Receipt(
-        id="",
-        open=False,
-        items=[],
-        shift_id="2",
-    )
+    receipt2 = Receipt(shift_id="2")
     receipt_service.add_receipt(receipt1)
 
     assert len(receipt_service.get_receipts_by_shift_id("1")) == 1

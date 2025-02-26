@@ -138,10 +138,7 @@ def create_receipt(
     receipt_service: ReceiptService = Depends(get_receipt_service),
 ) -> SingleReceiptResponse:
     receipt = Receipt(
-        id="",
-        open=True,
         shift_id=request.shift_id,
-        items=[],
     )
     receipt = receipt_service.add_receipt(receipt)
     return SingleReceiptResponse(
