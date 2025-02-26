@@ -141,7 +141,6 @@ class ReceiptService:
                     paid=in_currency_paid,
                 )
             )
-            print(in_currency_paid)
 
             return self.get_receipt(receipt_id)
         except RecordNotFound:

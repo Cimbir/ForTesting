@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from starlette.requests import Request
 
@@ -11,6 +11,7 @@ from finalproject.service.currency_conversion.currency_conversion import (
 from finalproject.service.currency_conversion.exchangerate_api_adapter import (
     ExchangeRateAPIFacade,
 )
+from finalproject.service.exceptions import ShiftNotFound, ProductNotFound, ReceiptNotFound
 from finalproject.service.receipts import ReceiptService
 from finalproject.store.buy_n_get_n import BuyNGetNStore
 from finalproject.store.combo import ComboStore
@@ -95,6 +96,7 @@ class ListReceiptsResponse(BaseModel):
 
 
 class ReceiptCostResponse(BaseModel):
+    receipt_id: str
     GEL: float
     USD: float
     EUR: float
@@ -102,8 +104,8 @@ class ReceiptCostResponse(BaseModel):
 
 class DiscountResponse(BaseModel):
     receipt_id: str
-    discount: float
-    final_cost: float
+    discount_in_GEL: float
+    final_cost_in_GEL: float
 
 
 def get_receipt_service(request: Request) -> ReceiptService:
@@ -137,18 +139,19 @@ def create_receipt(
     request: CreateReceiptRequest,
     receipt_service: ReceiptService = Depends(get_receipt_service),
 ) -> SingleReceiptResponse:
-    receipt = Receipt(
-        shift_id=request.shift_id,
-    )
-    receipt = receipt_service.add_receipt(receipt)
-    return SingleReceiptResponse(
-        receipt=ReceiptResponse(
-            id=receipt.id,
-            open=receipt.open,
-            shift_id=receipt.shift_id,
-            items=[],
+    try:
+        receipt = Receipt(shift_id=request.shift_id)
+        receipt = receipt_service.add_receipt(receipt)
+        return SingleReceiptResponse(
+            receipt=ReceiptResponse(
+                id=receipt.id,
+                open=receipt.open,
+                shift_id=receipt.shift_id,
+                items=[],
+            )
         )
-    )
+    except ShiftNotFound:
+        raise HTTPException(status_code=404, detail="Shift not found")
 
 
 @receipts_api.post(
@@ -161,30 +164,36 @@ def add_item(
     request: AddItemRequest,
     receipt_service: ReceiptService = Depends(get_receipt_service),
 ) -> SingleReceiptResponse:
-    receipt = receipt_service.update_product_in_receipt(
-        receipt_id, request.product_id, request.quantity
-    )
-    return SingleReceiptResponse(
-        receipt=ReceiptResponse(
-            id=receipt.id,
-            open=receipt.open,
-            shift_id=receipt.shift_id,
-            items=[
-                ReceiptItemResponse(
-                    id=item.id,
-                    product_id=item.product_id,
-                    quantity=item.quantity,
-                    price=item.price,
-                    total=item.quantity * item.price,
-                )
-                for item in receipt.items
-            ],
+    try:
+        receipt = receipt_service.update_product_in_receipt(
+            receipt_id, request.product_id, request.quantity
         )
-    )
+        return SingleReceiptResponse(
+            receipt=ReceiptResponse(
+                id=receipt.id,
+                open=receipt.open,
+                shift_id=receipt.shift_id,
+                items=[
+                    ReceiptItemResponse(
+                        id=item.id,
+                        product_id=item.product_id,
+                        quantity=item.quantity,
+                        price=item.price,
+                        total=item.quantity * item.price,
+                    )
+                    for item in receipt.items
+                ],
+            )
+        )
+    except ProductNotFound:
+        raise HTTPException(status_code=404, detail="Product not found")
+    except ReceiptNotFound:
+        raise HTTPException(status_code=404, detail="Receipt not found")
 
 
-@receipts_api.post(
+@receipts_api.get(
     "/{receipt_id}/quotes",
+    status_code=200,
     response_model=ReceiptCostResponse,
 )
 def calculate_payment(
@@ -194,54 +203,66 @@ def calculate_payment(
         get_currency_conversion_service
     ),
 ) -> ReceiptCostResponse:
-    receipt_cost = receipt_service.get_receipt_cost(receipt_id)
-    return ReceiptCostResponse(
-        GEL=receipt_cost,
-        USD=currency_conversion_service.convert(receipt_cost, "GEL", "USD"),
-        EUR=currency_conversion_service.convert(receipt_cost, "GEL", "EUR"),
-    )
+    try:
+        receipt_cost = receipt_service.get_receipt_cost(receipt_id)
+        return ReceiptCostResponse(
+            receipt_id=receipt_id,
+            GEL=receipt_cost,
+            USD=currency_conversion_service.convert(receipt_cost, "GEL", "USD"),
+            EUR=currency_conversion_service.convert(receipt_cost, "GEL", "EUR"),
+        )
+    except ReceiptNotFound:
+        raise HTTPException(status_code=404, detail="Receipt not found")
 
 
-@receipts_api.post(
+@receipts_api.get(
     "/{receipt_id}/discount",
+    status_code=200,
     response_model=DiscountResponse,
 )
 def calculate_discount(
     receipt_id: str,
     receipt_service: ReceiptService = Depends(get_receipt_service),
 ) -> DiscountResponse:
-    discount = receipt_service.get_receipt_discount_amount(receipt_id)
-    return DiscountResponse(
-        receipt_id=receipt_id,
-        discount=discount,
-        final_cost=receipt_service.get_receipt_cost(receipt_id),
-    )
+    try:
+        discount = receipt_service.get_receipt_discount_amount(receipt_id)
+        return DiscountResponse(
+            receipt_id=receipt_id,
+            discount_in_GEL=discount,
+            final_cost_in_GEL=receipt_service.get_receipt_cost(receipt_id),
+        )
+    except ReceiptNotFound:
+        raise HTTPException(status_code=404, detail="Receipt not found")
 
 
 @receipts_api.post(
     "/{receipt_id}/payments",
-    response_model=ReceiptCostResponse,
+    status_code=201,
+    response_model=SingleReceiptResponse,
 )
 def pay_receipt(
     receipt_id: str,
     request: PayReceiptRequest,
     receipt_service: ReceiptService = Depends(get_receipt_service),
 ) -> SingleReceiptResponse:
-    closed = receipt_service.close_receipt(receipt_id, request.currency)
-    return SingleReceiptResponse(
-        receipt=ReceiptResponse(
-            id=closed.id,
-            open=closed.open,
-            shift_id=closed.shift_id,
-            items=[
-                ReceiptItemResponse(
-                    id=item.id,
-                    product_id=item.product_id,
-                    quantity=item.quantity,
-                    price=item.price,
-                    total=item.quantity * item.price,
-                )
-                for item in closed.items
-            ],
+    try:
+        closed = receipt_service.close_receipt(receipt_id, request.currency)
+        return SingleReceiptResponse(
+            receipt=ReceiptResponse(
+                id=closed.id,
+                open=closed.open,
+                shift_id=closed.shift_id,
+                items=[
+                    ReceiptItemResponse(
+                        id=item.id,
+                        product_id=item.product_id,
+                        quantity=item.quantity,
+                        price=item.price,
+                        total=item.quantity * item.price,
+                    )
+                    for item in closed.items
+                ],
+            )
         )
-    )
+    except ReceiptNotFound:
+        raise HTTPException(status_code=404, detail="Receipt not found")
