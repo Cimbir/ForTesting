@@ -1,9 +1,9 @@
-from finalproject.service.currency_conversion import CurrencyConversionService
-from finalproject.service.exchangerate_api_adapter import (
+from finalproject.service.currency_conversion.currency_conversion import CurrencyConversionService
+from finalproject.service.currency_conversion.exchangerate_api_adapter import (
     ExchangeRateAPIAdapter,
     ExchangeRateAPIFacade,
 )
-from finalproject.service.exchangerate_api_client import (
+from finalproject.service.currency_conversion.exchangerate_api_client import (
     ExchangeRateAPIFakeClient,
     ExchangeRatesFromResponse,
 )

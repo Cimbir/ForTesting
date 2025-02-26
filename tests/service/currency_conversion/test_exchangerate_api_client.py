@@ -1,10 +1,10 @@
 from unittest.mock import MagicMock, Mock, patch
 
-from finalproject.service.exchangerate_api_client import (
+from finalproject.service.currency_conversion.exchangerate_api_client import (
     EXCHANGE_RATE_API_GET_RATES_FORMAT,
     ExchangeRateAPIRemoteClient,
 )
-from finalproject.service.http_client import HttpxAPIClient
+from finalproject.service.currency_conversion.http_client import HttpxAPIClient
 
 
 @patch("httpx.get")

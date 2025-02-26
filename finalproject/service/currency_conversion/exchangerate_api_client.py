@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Protocol
 
-from finalproject.service.currency_conversion import ConversionRequestFailed
-from finalproject.service.http_client import HttpAPIClient
+from finalproject.service.currency_conversion.currency_conversion import ConversionRequestFailed
+from finalproject.service.currency_conversion.http_client import HttpAPIClient
 
 EXCHANGE_RATE_API_DEFAULT_ENDPOINT = "https://open.er-api.com/v6"
 EXCHANGE_RATE_API_GET_RATES_FORMAT = "/latest/{currency}"

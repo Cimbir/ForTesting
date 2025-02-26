@@ -1,13 +1,13 @@
-from finalproject.service.awesome_api_adapter import (
+from finalproject.service.currency_conversion.awesome_api_adapter import (
     AwesomeAPIAdapter,
     AwesomeAPIFacade,
     AwesomeAPIFindAnyExchangeRateStrategy,
 )
-from finalproject.service.awesome_api_client import (
+from finalproject.service.currency_conversion.awesome_api_client import (
     FakeAwesomeAPIClient,
     GetExchangeRateResponse,
 )
-from finalproject.service.currency_conversion import (
+from finalproject.service.currency_conversion.currency_conversion import (
     CurrencyConversionService,
     MockMidExchangeRateRetriever,
 )

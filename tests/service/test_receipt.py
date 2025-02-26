@@ -88,11 +88,11 @@ def test_should_close_receipt(receipt_service: ReceiptService) -> None:
     receipt = receipt_service.add_receipt(
         Receipt(id="", open=True, items=[], paid=0, shift_id="1")
     )
-    receipt_service.close_receipt(receipt.id, 10)
+    receipt_service.close_receipt(receipt.id)
 
     receipt = receipt_service.get_receipt(receipt.id)
     assert not receipt.open
-    assert receipt.paid == 10
+    assert receipt.paid == 0
 
 
 def test_raise_receipt_not_found_on_closing_non_existent_receipt(
@@ -104,7 +104,7 @@ def test_raise_receipt_not_found_on_closing_non_existent_receipt(
     receipt_service.add_receipt(
         Receipt(id="1", open=True, items=[], paid=0, shift_id="1")
     )
-    pytest.raises(ReceiptNotFound, receipt_service.close_receipt, "2", 10)
+    pytest.raises(ReceiptNotFound, receipt_service.close_receipt, "2")
 
 
 def test_should_add_item_to_receipt(receipt_service: ReceiptService) -> None:
@@ -117,7 +117,10 @@ def test_should_add_item_to_receipt(receipt_service: ReceiptService) -> None:
     receipt_service.product_store.add(ProductRecord("1", "product 1", 1.0))
     item = ReceiptItem(id="", product_id="1", quantity=1, price=1.0)
 
-    receipt = receipt_service.add_item_to_receipt(receipt_id=receipt.id, item=item)
+    receipt = receipt_service.update_product_in_receipt(
+        receipt_id=receipt.id,
+        product_id=item.product_id,
+        quantity=item.quantity)
 
     assert item.in_list_without_id(receipt.items)
     assert len(receipt.items) == 1
@@ -129,7 +132,7 @@ def test_should_raise_receipt_not_found_when_adding_item_to_non_existent_receipt
     receipt_service.product_store.add(ProductRecord("1", "product 1", 1.0))
 
     item = ReceiptItem(id="", product_id="1", quantity=1, price=1.0)
-    pytest.raises(ReceiptNotFound, receipt_service.add_item_to_receipt, "1", item)
+    pytest.raises(ReceiptNotFound, receipt_service.update_product_in_receipt, "1", item.product_id, item.quantity)
 
 
 def test_should_raise_product_not_found_when_adding_item_with_non_existent_product(
@@ -144,7 +147,8 @@ def test_should_raise_product_not_found_when_adding_item_with_non_existent_produ
 
     item = ReceiptItem(id="", product_id="1", quantity=1, price=1.0)
     pytest.raises(
-        ProductNotFound, receipt_service.add_item_to_receipt, receipt.id, item
+        ProductNotFound, receipt_service.update_product_in_receipt,
+        receipt.id, item.product_id, item.quantity
     )
 
 
@@ -163,15 +167,16 @@ def test_should_update_item_in_receipt(receipt_service: ReceiptService) -> None:
         )
     )
 
-    receipt_service.update_item_in_receipt(
+    receipt_service.update_product_in_receipt(
         receipt_id=receipt.id,
-        item=ReceiptItem(id=receipt.items[0].id, product_id="1", quantity=2, price=1.0),
+        product_id=receipt.items[0].product_id,
+        quantity=2,
     )
 
     compare_receipt = Receipt(
         id="",
         open=True,
-        items=[ReceiptItem(id="", product_id="1", quantity=2, price=1.0)],
+        items=[ReceiptItem(id="", product_id="1", quantity=3, price=1.0)],
         paid=0,
         shift_id="1",
     )
@@ -194,9 +199,10 @@ def test_should_raise_receipt_item_not_found_when_updating_non_existent_item(
 
     pytest.raises(
         ReceiptNotFound,
-        receipt_service.update_item_in_receipt,
+        receipt_service.update_product_in_receipt,
         receipt.id,
-        ReceiptItem(id="1", product_id="1", quantity=1, price=1.0),
+        "1",
+        1,
     )
 
 
@@ -215,7 +221,7 @@ def test_should_remove_item_from_receipt(receipt_service: ReceiptService) -> Non
         )
     )
 
-    receipt_service.remove_item_from_receipt(receipt.id, receipt.items[0].id)
+    receipt_service.remove_product_from_receipt(receipt.id, receipt.items[0].id)
 
     assert receipt_service.get_receipt(receipt.id).compare_without_id(
         Receipt(
@@ -238,7 +244,7 @@ def test_should_raise_receipt_item_not_found_when_removing_non_existent_item(
         Receipt(id="", open=True, items=[], paid=0, shift_id="1")
     )
     pytest.raises(
-        ReceiptItemNotFound, receipt_service.remove_item_from_receipt, receipt.id, "1"
+        ReceiptItemNotFound, receipt_service.remove_product_from_receipt, receipt.id, "1"
     )
 
 

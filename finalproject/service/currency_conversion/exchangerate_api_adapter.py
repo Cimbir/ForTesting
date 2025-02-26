@@ -1,13 +1,13 @@
-from finalproject.service.currency_conversion import (
+from finalproject.service.currency_conversion.currency_conversion import (
     BaseCurrencyConversionService,
     BaseMidExchangeRateRetriever,
     ConversionError,
 )
-from finalproject.service.exchangerate_api_client import (
+from finalproject.service.currency_conversion.exchangerate_api_client import (
     ExchangeRateAPIClient,
     ExchangeRateAPIRemoteClient,
 )
-from finalproject.service.http_client import HttpxAPIClient
+from finalproject.service.currency_conversion.http_client import HttpxAPIClient
 
 
 class ExchangeRateAPIAdapter(BaseMidExchangeRateRetriever):

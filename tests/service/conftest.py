@@ -17,6 +17,11 @@ def receipt_service(distributor: StoreDistributor) -> ReceiptService:
         distributor.receipt_items(),
         distributor.shifts(),
         distributor.products(),
+        distributor.combos(),
+        distributor.combo_items(),
+        distributor.product_discount(),
+        distributor.receipt_discounts(),
+        distributor.buy_n_get_n(),
     )
 
 
