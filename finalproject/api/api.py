@@ -6,8 +6,11 @@ from apexdevkit.server import UvicornServer
 from fastapi import FastAPI
 from starlette.testclient import TestClient
 
-from finalproject.api.campaigns import campaigns_api
+from finalproject.api.buy_n_get_n import buy_n_get_n_api
+from finalproject.api.combos import combos_api
+from finalproject.api.product_discounts import product_discounts_api
 from finalproject.api.products import products_api
+from finalproject.api.receipt_discounts import receipt_discount_api
 
 
 class API(Protocol):
@@ -29,7 +32,16 @@ class APIUsingFastAPI:
             products_api, prefix="/products", tags=["Products"]
         )
         self._fast_api.include_router(
-            campaigns_api, prefix="/campaigns", tags=["Campaigns"]
+            product_discounts_api, prefix="/product_discounts", tags=["ProductDiscounts"]
+        )
+        self._fast_api.include_router(
+            receipt_discount_api, prefix="/receipt_discounts", tags=["ReceiptDiscounts"]
+        )
+        self._fast_api.include_router(
+            buy_n_get_n_api, prefix="/buy_n_get_n", tags=["BuyNGetN"]
+        )
+        self._fast_api.include_router(
+            combos_api, prefix="/combos", tags=["Combos"]
         )
 
     def run(self) -> None:

@@ -34,4 +34,3 @@ class ProductService:
         except RecordNotFound:
             raise ProductNotFound(product.id)
         return product
-

@@ -16,6 +16,7 @@ class _Distributor(Protocol):
     def products(self) -> ProductStore:
         pass
 
+
 class ProductRequest(BaseModel):
     name: str
     price: float
@@ -46,6 +47,7 @@ def list_products(
     products = product_service.get_all_products()
     return ListProductsResponse(products=products)
 
+
 @products_api.post(
     "",
     status_code=201,
@@ -55,9 +57,10 @@ def add_product(
     product_request: ProductRequest,
     product_service: ProductService = Depends(get_product_service),
 ) -> SingleProductResponse:
-    product = Product(id='', name=product_request.name, price=product_request.price)
+    product = Product(id="", name=product_request.name, price=product_request.price)
     product_service.add_product(product)
     return SingleProductResponse(product=product)
+
 
 @products_api.get(
     "/{product_id}",
@@ -71,8 +74,11 @@ def get_product(
     try:
         product = product_service.get_product(product_id)
     except ProductNotFound:
-        raise HTTPException(status_code=404, detail=f"Product with id={product_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Product with id={product_id} not found"
+        )
     return SingleProductResponse(product=product)
+
 
 @products_api.patch(
     "/{product_id}",
@@ -84,9 +90,13 @@ def update_product(
     product_request: ProductRequest,
     product_service: ProductService = Depends(get_product_service),
 ) -> SingleProductResponse:
-    product = Product(id=product_id, name=product_request.name, price=product_request.price)
+    product = Product(
+        id=product_id, name=product_request.name, price=product_request.price
+    )
     try:
         product_service.update_product(product)
     except ProductNotFound:
-        raise HTTPException(status_code=404, detail=f"Product with id={product_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Product with id={product_id} not found"
+        )
     return SingleProductResponse(product=product)
