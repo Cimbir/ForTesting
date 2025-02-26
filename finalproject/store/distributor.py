@@ -4,6 +4,7 @@ from typing import Protocol
 from finalproject.store.buy_n_get_n import BuyNGetNSQLiteStore, BuyNGetNStore
 from finalproject.store.combo import ComboSQLiteStore, ComboStore
 from finalproject.store.combo_item import ComboItemSQLiteStore, ComboItemStore
+from finalproject.store.paid_receipt import PaidReceiptSQLiteStore, PaidReceiptStore
 from finalproject.store.product import ProductSQLiteStore, ProductStore
 from finalproject.store.product_discount import (
     ProductDiscountSQLiteStore,
@@ -46,6 +47,9 @@ class StoreDistributor(Protocol):
     def shifts(self) -> ShiftStore:
         pass
 
+    def paid_receipts(self) -> PaidReceiptStore:
+        pass
+
     def destruct(self) -> None:
         """
         Closes connection to the database
@@ -66,6 +70,7 @@ class SQLiteStoreDistributor:
         self._receipt_discounts = ReceiptDiscountSQLiteStore(connection)
         self._product_discount = ProductDiscountSQLiteStore(connection)
         self._shifts = ShiftSQLiteStore(connection)
+        self._paid_receipts = PaidReceiptSQLiteStore(connection)
 
         # Add new stores here
 
@@ -97,6 +102,9 @@ class SQLiteStoreDistributor:
 
     def shifts(self) -> ShiftStore:
         return self._shifts
+
+    def paid_receipts(self) -> PaidReceiptStore:
+        return self._paid_receipts
 
     def destruct(self) -> None:
         self._connection.close()
