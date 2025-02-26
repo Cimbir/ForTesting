@@ -25,9 +25,7 @@ def test_should_return_empty_result(def_rec_close: ReceiptClose) -> None:
     def_rec_close = ReceiptDiscountDecorator(
         def_rec_close, ReceiptDiscount(discount=0.1, minimum_total=100)
     )
-    def_rec_close = ComboDecorator(
-        def_rec_close, Combo(discount=0.1)
-    )
+    def_rec_close = ComboDecorator(def_rec_close, Combo(discount=0.1))
     def_rec_close = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(

@@ -85,9 +85,7 @@ def test_raise_receipt_not_found_on_closing_non_existent_receipt(
 
 
 def test_should_add_item_to_receipt(receipt_service: ReceiptService) -> None:
-    receipt = receipt_service.add_receipt(
-        Receipt(shift_id="1")
-    )
+    receipt = receipt_service.add_receipt(Receipt(shift_id="1"))
     item = ReceiptItem(product_id="1", quantity=1, price=1.0)
 
     receipt = receipt_service.update_product_in_receipt(
@@ -114,9 +112,7 @@ def test_should_raise_receipt_not_found_when_adding_item_to_non_existent_receipt
 def test_should_raise_product_not_found_when_adding_item_with_non_existent_product(
     receipt_service: ReceiptService,
 ) -> None:
-    receipt = receipt_service.add_receipt(
-        Receipt(shift_id="1")
-    )
+    receipt = receipt_service.add_receipt(Receipt(shift_id="1"))
 
     item = ReceiptItem(product_id="3", quantity=1, price=1.0)
     pytest.raises(
@@ -170,9 +166,7 @@ def test_should_remove_item_from_receipt(receipt_service: ReceiptService) -> Non
 def test_should_raise_receipt_item_not_found_when_removing_non_existent_item(
     receipt_service: ReceiptService,
 ) -> None:
-    receipt = receipt_service.add_receipt(
-        Receipt(shift_id="1")
-    )
+    receipt = receipt_service.add_receipt(Receipt(shift_id="1"))
     pytest.raises(
         ReceiptItemNotFound,
         receipt_service.remove_product_from_receipt,

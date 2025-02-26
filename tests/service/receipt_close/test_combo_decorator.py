@@ -6,9 +6,7 @@ from tests.service.receipt_close.utils import get_receipt
 
 
 def test_should_return_zero_when_no_items(def_rec_close: ReceiptClose) -> None:
-    combo = ComboDecorator(
-        def_rec_close, Combo(discount=0.1)
-    )
+    combo = ComboDecorator(def_rec_close, Combo(discount=0.1))
     assert combo.close(get_receipt([])).price == 0.0
 
 

@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from email.policy import default
 from typing import Protocol, Sequence
 
 from finalproject.store.receipt import ReceiptRecord
@@ -22,7 +21,7 @@ class Model(Protocol):
 class ReceiptItem(Model):
     id: str = ""
     product_id: str = ""
-    quantity: int = 0.0
+    quantity: int = 0
     price: float = 0.0
 
     def to_record(self, receipt_id: str) -> ReceiptItemRecord:

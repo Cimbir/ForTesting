@@ -38,17 +38,13 @@ def test_should_handle_multiple_calls(def_rec_close: ReceiptClose) -> None:
     assert def_rec_close.close(receipt=get_receipt([])).price == 0.0
     assert (
         def_rec_close.close(
-            receipt=get_receipt(
-                [ReceiptItem(product_id="1", quantity=1, price=1.0)]
-            )
+            receipt=get_receipt([ReceiptItem(product_id="1", quantity=1, price=1.0)])
         ).price
         == 1.0
     )
     assert (
         def_rec_close.close(
-            receipt=get_receipt(
-                [ReceiptItem(product_id="1", quantity=1, price=1.0)]
-            )
+            receipt=get_receipt([ReceiptItem(product_id="1", quantity=1, price=1.0)])
         ).price
         == 1.0
     )

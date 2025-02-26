@@ -11,7 +11,11 @@ from finalproject.service.currency_conversion.currency_conversion import (
 from finalproject.service.currency_conversion.exchangerate_api_adapter import (
     ExchangeRateAPIFacade,
 )
-from finalproject.service.exceptions import ShiftNotFound, ProductNotFound, ReceiptNotFound
+from finalproject.service.exceptions import (
+    ProductNotFound,
+    ReceiptNotFound,
+    ShiftNotFound,
+)
 from finalproject.service.receipts import ReceiptService
 from finalproject.store.buy_n_get_n import BuyNGetNStore
 from finalproject.store.combo import ComboStore
