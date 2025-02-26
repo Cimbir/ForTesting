@@ -1,7 +1,9 @@
 import pytest
 
 from finalproject.service.campaigns import CampaignService
-from finalproject.service.currency_conversion.exchangerate_api_adapter import ExchangeRateAPIFacade
+from finalproject.service.currency_conversion.exchangerate_api_adapter import (
+    ExchangeRateAPIFacade,
+)
 from finalproject.service.receipts import ReceiptService
 from finalproject.store.distributor import SQLiteStoreDistributor, StoreDistributor
 

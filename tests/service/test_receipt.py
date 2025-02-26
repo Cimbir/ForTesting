@@ -98,9 +98,7 @@ def test_raise_receipt_not_found_on_closing_non_existent_receipt(
     receipt_service.shift_store.add(
         ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
     )
-    receipt_service.add_receipt(
-        Receipt(id="1", open=True, items=[], shift_id="1")
-    )
+    receipt_service.add_receipt(Receipt(id="1", open=True, items=[], shift_id="1"))
     pytest.raises(ReceiptNotFound, receipt_service.close_receipt, "2", "")
 
 

@@ -6,7 +6,9 @@ from finalproject.models.campaigns import (
     ReceiptDiscount,
 )
 from finalproject.models.models import Receipt, ReceiptItem
-from finalproject.service.currency_conversion.currency_conversion import CurrencyConversionService
+from finalproject.service.currency_conversion.currency_conversion import (
+    CurrencyConversionService,
+)
 from finalproject.service.exceptions import (
     ProductNotFound,
     ReceiptAlreadyExists,
@@ -49,7 +51,6 @@ class ReceiptService:
         product_discount_store: ProductDiscountStore,
         receipt_discount_store: ReceiptDiscountStore,
         buy_n_get_n_store: BuyNGetNStore,
-
         currency_conversion_service: CurrencyConversionService,
     ):
         self.receipt_store = receipt_store
