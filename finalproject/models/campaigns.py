@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from finalproject.models.models import Model
 from finalproject.store.buy_n_get_n import BuyNGetNRecord
@@ -10,11 +10,11 @@ from finalproject.store.receipt_discount import ReceiptDiscountRecord
 
 @dataclass
 class BuyNGetN(Model):
-    id: str
-    buy_product_id: str
-    buy_product_n: int
-    get_product_id: str
-    get_product_n: int
+    id: str = ""
+    buy_product_id: str = ""
+    buy_product_n: int = 0
+    get_product_id: str = ""
+    get_product_n: int = 0
 
     def to_record(self) -> BuyNGetNRecord:
         return BuyNGetNRecord(
@@ -38,9 +38,9 @@ class BuyNGetN(Model):
 
 @dataclass
 class ProductDiscount(Model):
-    id: str
-    product_id: str
-    discount: float
+    id: str = ""
+    product_id: str = ""
+    discount: float = 0.0
 
     def to_record(self) -> ProductDiscountRecord:
         return ProductDiscountRecord(
@@ -60,9 +60,9 @@ class ProductDiscount(Model):
 
 @dataclass
 class ReceiptDiscount(Model):
-    id: str
-    minimum_total: float
-    discount: float
+    id: str = ""
+    minimum_total: float = 0.0
+    discount: float = 0.0
 
     def to_record(self) -> ReceiptDiscountRecord:
         return ReceiptDiscountRecord(
@@ -82,9 +82,9 @@ class ReceiptDiscount(Model):
 
 @dataclass
 class ComboItem(Model):
-    id: str
-    product_id: str
-    quantity: int
+    id: str = ""
+    product_id: str = ""
+    quantity: int = 0
 
     def to_record(self, combo_id: str) -> ComboItemRecord:
         return ComboItemRecord(
@@ -105,10 +105,10 @@ class ComboItem(Model):
 
 @dataclass
 class Combo(Model):
-    id: str
-    name: str
-    discount: float
-    items: list[ComboItem]
+    id: str = ""
+    name: str = ""
+    discount: float = 0.0
+    items: list[ComboItem] = field(default_factory=list)
 
     def to_record(self) -> ComboRecord:
         return ComboRecord(

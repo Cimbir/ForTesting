@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from starlette.testclient import TestClient
 
 from finalproject.api.products import products_api
+from finalproject.api.receipts import receipts_api
 
 
 class API(Protocol):
@@ -26,6 +27,9 @@ class APIUsingFastAPI:
     def _register_routes(self) -> None:
         self._fast_api.include_router(
             products_api, prefix="/products", tags=["Products"]
+        )
+        self._fast_api.include_router(
+            receipts_api, prefix="/receipts", tags=["Receipts"]
         )
 
     def run(self) -> None:

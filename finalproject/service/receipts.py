@@ -29,6 +29,7 @@ from finalproject.service.receipt_close.receipt_discount_decorator import (
 from finalproject.store.buy_n_get_n import BuyNGetNStore
 from finalproject.store.combo import ComboStore
 from finalproject.store.combo_item import ComboItemStore
+from finalproject.store.paid_receipt import PaidReceiptRecord, PaidReceiptStore
 from finalproject.store.product import ProductStore
 from finalproject.store.product_discount import ProductDiscountStore
 from finalproject.store.receipt import ReceiptStore
@@ -46,6 +47,7 @@ class ReceiptService:
         receipt_item_store: ReceiptItemStore,
         shift_store: ShiftStore,
         product_store: ProductStore,
+        paid_receipt_store: PaidReceiptStore,
         combo_store: ComboStore,
         combo_item_store: ComboItemStore,
         product_discount_store: ProductDiscountStore,
@@ -57,6 +59,7 @@ class ReceiptService:
         self.receipt_item_store = receipt_item_store
         self.shift_store = shift_store
         self.product_store = product_store
+        self.paid_receipt_store = paid_receipt_store
 
         self.combo_store = combo_store
         self.combo_item_store = combo_item_store
@@ -124,7 +127,22 @@ class ReceiptService:
                     close_result.added_products[added_product_id],
                 )
 
+            in_currency_paid = self.currency_conversion_service.convert(
+                close_result.price, "GEL", currency_name
+            )
+
             self.receipt_store.close_receipt_by_id(receipt_id)
+
+            self.paid_receipt_store.add(
+                PaidReceiptRecord(
+                    id=generate_id(),
+                    receipt_id=receipt_id,
+                    currency_name=currency_name,
+                    paid=in_currency_paid,
+                )
+            )
+            print(in_currency_paid)
+
             return self.get_receipt(receipt_id)
         except RecordNotFound:
             raise ReceiptNotFound(receipt_id)

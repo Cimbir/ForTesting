@@ -15,6 +15,7 @@ from finalproject.service.receipts import ReceiptService
 from finalproject.store.buy_n_get_n import BuyNGetNStore
 from finalproject.store.combo import ComboStore
 from finalproject.store.combo_item import ComboItemStore
+from finalproject.store.paid_receipt import PaidReceiptStore
 from finalproject.store.product import ProductStore
 from finalproject.store.product_discount import ProductDiscountStore
 from finalproject.store.receipt import ReceiptStore
@@ -26,7 +27,7 @@ receipts_api = APIRouter()
 
 
 class _Distributor(Protocol):
-    def receipts(self) -> ReceiptStore:
+    def receipt(self) -> ReceiptStore:
         pass
 
     def receipt_items(self) -> ReceiptItemStore:
@@ -44,13 +45,16 @@ class _Distributor(Protocol):
     def combo_items(self) -> ComboItemStore:
         pass
 
-    def product_discounts(self) -> ProductDiscountStore:
+    def product_discount(self) -> ProductDiscountStore:
         pass
 
     def receipt_discounts(self) -> ReceiptDiscountStore:
         pass
 
-    def buy_n_get_ns(self) -> BuyNGetNStore:
+    def buy_n_get_n(self) -> BuyNGetNStore:
+        pass
+
+    def paid_receipts(self) -> PaidReceiptStore:
         pass
 
 
@@ -106,15 +110,16 @@ def get_receipt_service(request: Request) -> ReceiptService:
     distributor: _Distributor = request.app.state.distributor
 
     return ReceiptService(
-        distributor.receipts(),
+        distributor.receipt(),
         distributor.receipt_items(),
         distributor.shifts(),
         distributor.products(),
+        distributor.paid_receipts(),
         distributor.combos(),
         distributor.combo_items(),
-        distributor.product_discounts(),
+        distributor.product_discount(),
         distributor.receipt_discounts(),
-        distributor.buy_n_get_ns(),
+        distributor.buy_n_get_n(),
         ExchangeRateAPIFacade(),
     )
 

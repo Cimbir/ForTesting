@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from email.policy import default
 from typing import Protocol, Sequence
 
 from finalproject.store.receipt import ReceiptRecord
@@ -6,7 +7,7 @@ from finalproject.store.receipt_item import ReceiptItemRecord
 
 
 class Model(Protocol):
-    id: str
+    id: str = ""
 
     def compare_without_id(self, other: "Model") -> bool:
         without_id = {k: v for k, v in self.__dict__.items() if k != "id"}
@@ -19,10 +20,10 @@ class Model(Protocol):
 
 @dataclass
 class ReceiptItem(Model):
-    id: str
-    product_id: str
-    quantity: int
-    price: float
+    id: str = ""
+    product_id: str = ""
+    quantity: int = 0.0
+    price: float = 0.0
 
     def to_record(self, receipt_id: str) -> ReceiptItemRecord:
         return ReceiptItemRecord(
@@ -45,10 +46,10 @@ class ReceiptItem(Model):
 
 @dataclass
 class Receipt(Model):
-    id: str
-    open: bool
-    shift_id: str
-    items: list[ReceiptItem]
+    id: str = ""
+    open: bool = True
+    shift_id: str = ""
+    items: list[ReceiptItem] = field(default_factory=list)
 
     def to_record(self) -> ReceiptRecord:
         return ReceiptRecord(

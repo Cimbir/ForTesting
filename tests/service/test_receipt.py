@@ -10,14 +10,10 @@ from finalproject.service.exceptions import (
 from finalproject.service.receipts import (
     ReceiptService,
 )
-from finalproject.store.product import ProductRecord
-from finalproject.store.shift import ShiftRecord
+from finalproject.store.paid_receipt import PaidReceiptStore
 
 
 def test_should_add_and_get_empty_receipt(receipt_service: ReceiptService) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
     receipt = Receipt(id="", open=True, items=[], shift_id="1")
     receipt_response = receipt_service.add_receipt(receipt)
     assert receipt_response.compare_without_id(receipt)
@@ -25,11 +21,6 @@ def test_should_add_and_get_empty_receipt(receipt_service: ReceiptService) -> No
 
 
 def test_should_add_receipt_with_items(receipt_service: ReceiptService) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
-    receipt_service.product_store.add(ProductRecord("1", "product 1", 1.0))
-    receipt_service.product_store.add(ProductRecord("2", "product 2", 2.0))
     receipt = Receipt(
         id="",
         open=True,
@@ -45,12 +36,6 @@ def test_should_add_receipt_with_items(receipt_service: ReceiptService) -> None:
 
 
 def test_should_get_all_receipts(receipt_service: ReceiptService) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
-    receipt_service.product_store.add(ProductRecord("1", "product 1", 1.0))
-    receipt_service.product_store.add(ProductRecord("2", "product 2", 2.0))
-
     assert len(receipt_service.get_all_receipts()) == 0
 
     receipt_1 = Receipt(id="1", open=True, items=[], shift_id="1")
@@ -79,37 +64,36 @@ def test_should_raise_receipt_not_found_when_getting_non_existent_receipt(
     pytest.raises(ReceiptNotFound, receipt_service.get_receipt, "1")
 
 
-def test_should_close_receipt(receipt_service: ReceiptService) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
+def test_should_close_receipt(
+    receipt_service: ReceiptService,
+    paid_receipt_store: PaidReceiptStore,
+) -> None:
     receipt = receipt_service.add_receipt(
-        Receipt(id="", open=True, items=[], shift_id="1")
+        Receipt(
+            id="",
+            open=True,
+            items=[ReceiptItem(id="", product_id="1", quantity=1, price=1.0)],
+            shift_id="1",
+        )
     )
-    receipt_service.close_receipt(receipt.id, "")
+    receipt_service.close_receipt(receipt.id, "GEL")
 
     receipt = receipt_service.get_receipt(receipt.id)
     assert not receipt.open
+    assert paid_receipt_store.filter_by_field("receipt_id", receipt.id)[0].paid == 1.0
 
 
 def test_raise_receipt_not_found_on_closing_non_existent_receipt(
     receipt_service: ReceiptService,
 ) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
     receipt_service.add_receipt(Receipt(id="1", open=True, items=[], shift_id="1"))
     pytest.raises(ReceiptNotFound, receipt_service.close_receipt, "2", "")
 
 
 def test_should_add_item_to_receipt(receipt_service: ReceiptService) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
     receipt = receipt_service.add_receipt(
         Receipt(id="1", open=True, items=[], shift_id="1")
     )
-    receipt_service.product_store.add(ProductRecord("1", "product 1", 1.0))
     item = ReceiptItem(id="", product_id="1", quantity=1, price=1.0)
 
     receipt = receipt_service.update_product_in_receipt(
@@ -123,8 +107,6 @@ def test_should_add_item_to_receipt(receipt_service: ReceiptService) -> None:
 def test_should_raise_receipt_not_found_when_adding_item_to_non_existent_receipt(
     receipt_service: ReceiptService,
 ) -> None:
-    receipt_service.product_store.add(ProductRecord("1", "product 1", 1.0))
-
     item = ReceiptItem(id="", product_id="1", quantity=1, price=1.0)
     pytest.raises(
         ReceiptNotFound,
@@ -138,14 +120,11 @@ def test_should_raise_receipt_not_found_when_adding_item_to_non_existent_receipt
 def test_should_raise_product_not_found_when_adding_item_with_non_existent_product(
     receipt_service: ReceiptService,
 ) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
     receipt = receipt_service.add_receipt(
         Receipt(id="1", open=True, items=[], shift_id="1")
     )
 
-    item = ReceiptItem(id="", product_id="1", quantity=1, price=1.0)
+    item = ReceiptItem(id="", product_id="3", quantity=1, price=1.0)
     pytest.raises(
         ProductNotFound,
         receipt_service.update_product_in_receipt,
@@ -156,10 +135,6 @@ def test_should_raise_product_not_found_when_adding_item_with_non_existent_produ
 
 
 def test_should_update_item_in_receipt(receipt_service: ReceiptService) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
-    receipt_service.product_store.add(ProductRecord("1", "product 1", 1.0))
     receipt = receipt_service.add_receipt(
         Receipt(
             id="",
@@ -188,10 +163,6 @@ def test_should_update_item_in_receipt(receipt_service: ReceiptService) -> None:
 
 
 def test_should_remove_item_from_receipt(receipt_service: ReceiptService) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
-    receipt_service.product_store.add(ProductRecord("1", "product 1", 1.0))
     receipt = receipt_service.add_receipt(
         Receipt(
             id="",
@@ -216,9 +187,6 @@ def test_should_remove_item_from_receipt(receipt_service: ReceiptService) -> Non
 def test_should_raise_receipt_item_not_found_when_removing_non_existent_item(
     receipt_service: ReceiptService,
 ) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
     receipt = receipt_service.add_receipt(
         Receipt(id="", open=True, items=[], shift_id="1")
     )
@@ -231,15 +199,6 @@ def test_should_raise_receipt_item_not_found_when_removing_non_existent_item(
 
 
 def test_should_get_receipts_by_shift_id(receipt_service: ReceiptService) -> None:
-    receipt_service.shift_store.add(
-        ShiftRecord("1", "open", "2021-01-01", "2021-01-02")
-    )
-    receipt_service.shift_store.add(
-        ShiftRecord("2", "open", "2021-01-01", "2021-01-02")
-    )
-    receipt_service.product_store.add(
-        ProductRecord("1", "product 1", 1.0),
-    )
     receipt1 = Receipt(
         id="",
         open=True,
@@ -266,4 +225,4 @@ def test_should_get_receipts_by_shift_id(receipt_service: ReceiptService) -> Non
 def test_should_raise_shift_not_found_when_getting_receipts_by_non_existent_shift_id(
     receipt_service: ReceiptService,
 ) -> None:
-    pytest.raises(ShiftNotFound, receipt_service.get_receipts_by_shift_id, "1")
+    pytest.raises(ShiftNotFound, receipt_service.get_receipts_by_shift_id, "3")
