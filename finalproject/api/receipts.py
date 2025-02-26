@@ -5,8 +5,12 @@ from pydantic import BaseModel
 from starlette.requests import Request
 
 from finalproject.models.models import Receipt
-from finalproject.service.currency_conversion import CurrencyConversionService
-from finalproject.service.currency_conversion.exchangerate_api_adapter import ExchangeRateAPIFacade
+from finalproject.service.currency_conversion.currency_conversion import (
+    CurrencyConversionService,
+)
+from finalproject.service.currency_conversion.exchangerate_api_adapter import (
+    ExchangeRateAPIFacade,
+)
 from finalproject.service.receipts import ReceiptService
 from finalproject.store.buy_n_get_n import BuyNGetNStore
 from finalproject.store.combo import ComboStore
@@ -74,7 +78,6 @@ class ReceiptItemResponse(BaseModel):
 class ReceiptResponse(BaseModel):
     id: str
     open: bool
-    paid: float
     shift_id: str
     items: list[ReceiptItemResponse]
 
@@ -112,6 +115,7 @@ def get_receipt_service(request: Request) -> ReceiptService:
         distributor.product_discounts(),
         distributor.receipt_discounts(),
         distributor.buy_n_get_ns(),
+        ExchangeRateAPIFacade(),
     )
 
 
@@ -131,7 +135,6 @@ def create_receipt(
     receipt = Receipt(
         id="",
         open=True,
-        paid=0,
         shift_id=request.shift_id,
         items=[],
     )
@@ -140,7 +143,6 @@ def create_receipt(
         receipt=ReceiptResponse(
             id=receipt.id,
             open=receipt.open,
-            paid=receipt.paid,
             shift_id=receipt.shift_id,
             items=[],
         )
@@ -164,7 +166,6 @@ def add_item(
         receipt=ReceiptResponse(
             id=receipt.id,
             open=receipt.open,
-            paid=receipt.paid,
             shift_id=receipt.shift_id,
             items=[
                 ReceiptItemResponse(
@@ -224,12 +225,11 @@ def pay_receipt(
     request: PayReceiptRequest,
     receipt_service: ReceiptService = Depends(get_receipt_service),
 ) -> SingleReceiptResponse:
-    closed = receipt_service.close_receipt(receipt_id)
+    closed = receipt_service.close_receipt(receipt_id, request.currency)
     return SingleReceiptResponse(
         receipt=ReceiptResponse(
             id=closed.id,
             open=closed.open,
-            paid=closed.paid,
             shift_id=closed.shift_id,
             items=[
                 ReceiptItemResponse(

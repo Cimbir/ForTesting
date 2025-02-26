@@ -47,7 +47,6 @@ class ReceiptItem(Model):
 class Receipt(Model):
     id: str
     open: bool
-    paid: float
     shift_id: str
     items: list[ReceiptItem]
 
@@ -55,7 +54,6 @@ class Receipt(Model):
         return ReceiptRecord(
             id=self.id,
             open=self.open,
-            paid=self.paid,
             shift_id=self.shift_id,
         )
 
@@ -64,7 +62,6 @@ class Receipt(Model):
         return cls(
             id=record.id,
             open=record.open,
-            paid=record.paid,
             shift_id=record.shift_id,
             items=items,
         )

@@ -6,6 +6,7 @@ from finalproject.models.campaigns import (
     ReceiptDiscount,
 )
 from finalproject.models.models import Receipt, ReceiptItem
+from finalproject.service.currency_conversion.currency_conversion import CurrencyConversionService
 from finalproject.service.exceptions import (
     ProductNotFound,
     ReceiptAlreadyExists,
@@ -48,6 +49,8 @@ class ReceiptService:
         product_discount_store: ProductDiscountStore,
         receipt_discount_store: ReceiptDiscountStore,
         buy_n_get_n_store: BuyNGetNStore,
+
+        currency_conversion_service: CurrencyConversionService,
     ):
         self.receipt_store = receipt_store
         self.receipt_item_store = receipt_item_store
@@ -59,6 +62,8 @@ class ReceiptService:
         self.product_discount_store = product_discount_store
         self.receipt_discount_store = receipt_discount_store
         self.buy_n_get_n_store = buy_n_get_n_store
+
+        self.currency_conversion_service = currency_conversion_service
 
     def add_receipt(self, receipt: Receipt) -> Receipt:
         self._validate_shift(receipt.shift_id)
@@ -103,7 +108,7 @@ class ReceiptService:
             receipts.append(receipt)
         return receipts
 
-    def close_receipt(self, receipt_id: str) -> Receipt:
+    def close_receipt(self, receipt_id: str, currency_name: str) -> Receipt:
         try:
             receipt = self.get_receipt(receipt_id)
             if not receipt.open:
@@ -118,7 +123,7 @@ class ReceiptService:
                     close_result.added_products[added_product_id],
                 )
 
-            self.receipt_store.close_receipt_by_id(receipt_id, close_result.price)
+            self.receipt_store.close_receipt_by_id(receipt_id)
             return self.get_receipt(receipt_id)
         except RecordNotFound:
             raise ReceiptNotFound(receipt_id)
