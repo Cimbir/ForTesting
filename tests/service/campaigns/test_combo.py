@@ -1,8 +1,8 @@
 import pytest
 
-from finalproject.models.campaigns import ComboItem, Combo
+from finalproject.models.campaigns import Combo, ComboItem
 from finalproject.service.campaigns.combos import ComboService
-from finalproject.service.exceptions import ProductNotFound, ComboNotFound
+from finalproject.service.exceptions import ComboNotFound, ProductNotFound
 from finalproject.store.product import ProductRecord
 
 

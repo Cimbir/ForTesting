@@ -22,6 +22,7 @@ def receipt_service(distributor: StoreDistributor) -> ReceiptService:
         distributor.products(),
     )
 
+
 @pytest.fixture
 def combo_service(distributor: StoreDistributor) -> ComboService:
     return ComboService(
@@ -30,18 +31,21 @@ def combo_service(distributor: StoreDistributor) -> ComboService:
         distributor.combo_items(),
     )
 
+
 @pytest.fixture
 def product_discount_service(distributor: StoreDistributor) -> ProductDiscountService:
     return ProductDiscountService(
         distributor.products(),
         distributor.product_discount(),
-   )
+    )
+
 
 @pytest.fixture
 def receipt_discount_service(distributor: StoreDistributor) -> ReceiptDiscountService:
     return ReceiptDiscountService(
         distributor.receipt_discounts(),
     )
+
 
 @pytest.fixture
 def buy_n_get_n_service(distributor: StoreDistributor) -> BuyNGetNService:

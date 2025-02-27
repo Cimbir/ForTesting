@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.requests import Request
 from pydantic import BaseModel
 
-from finalproject.models.campaigns import ComboItem, Combo
+from finalproject.models.campaigns import Combo, ComboItem
 from finalproject.service.campaigns.combos import ComboService
 from finalproject.service.exceptions import ComboNotFound
 from finalproject.store.combo import ComboStore
@@ -13,16 +13,18 @@ from finalproject.store.product import ProductStore
 
 combos_api = APIRouter()
 
+
 class _Distributor(Protocol):
     def products(self) -> ProductStore:
         pass
-    
+
     def combos(self) -> ComboStore:
         pass
 
     def combo_items(self) -> ComboItemStore:
         pass
-    
+
+
 class ComboRequest(BaseModel):
     name: str
     items: list[ComboItem]
@@ -35,16 +37,16 @@ class SingleComboResponse(BaseModel):
 
 class ListCombosResponse(BaseModel):
     combos: list[Combo]
-    
-def get_combo_service(
-        request: Request
-) -> ComboService:
+
+
+def get_combo_service(request: Request) -> ComboService:
     distributor: _Distributor = request.app.state.distributor
     return ComboService(
         distributor.products(),
         distributor.combos(),
         distributor.combo_items(),
     )
+
 
 @combos_api.get(
     "/",

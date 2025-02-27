@@ -18,9 +18,9 @@ def test_should_add_and_get_buy_n_get_n(buy_n_get_n_service: BuyNGetNService) ->
     )
     buy_n_get_n_response = buy_n_get_n_service.add_buy_n_get_n(buy_n_get_n)
     assert buy_n_get_n_response.compare_without_id(buy_n_get_n)
-    assert buy_n_get_n_service.get_buy_n_get_n(buy_n_get_n_response.id).compare_without_id(
-        buy_n_get_n
-    )
+    assert buy_n_get_n_service.get_buy_n_get_n(
+        buy_n_get_n_response.id
+    ).compare_without_id(buy_n_get_n)
 
 
 def test_should_get_all_buy_n_get_ns(buy_n_get_n_service: BuyNGetNService) -> None:
@@ -46,12 +46,16 @@ def test_should_get_all_buy_n_get_ns(buy_n_get_n_service: BuyNGetNService) -> No
     buy_n_get_n_service.add_buy_n_get_n(buy_n_get_n_2)
 
     assert len(buy_n_get_n_service.get_all_buy_n_get_ns()) == 2
-    assert buy_n_get_n_service.get_all_buy_n_get_ns()[0].compare_without_id(buy_n_get_n_1)
-    assert buy_n_get_n_service.get_all_buy_n_get_ns()[1].compare_without_id(buy_n_get_n_2)
+    assert buy_n_get_n_service.get_all_buy_n_get_ns()[0].compare_without_id(
+        buy_n_get_n_1
+    )
+    assert buy_n_get_n_service.get_all_buy_n_get_ns()[1].compare_without_id(
+        buy_n_get_n_2
+    )
 
 
 def test_should_not_add_buy_n_get_n_with_invalid_product_id(
-        buy_n_get_n_service: BuyNGetNService,
+    buy_n_get_n_service: BuyNGetNService,
 ) -> None:
     buy_n_get_n_service.product_store.add(ProductRecord("1", "product 1", 1.0))
     buy_n_get_n = BuyNGetN(
@@ -65,7 +69,7 @@ def test_should_not_add_buy_n_get_n_with_invalid_product_id(
 
 
 def test_should_raise_buy_n_get_n_not_found_when_getting_non_existent_buy_n_get_n(
-        buy_n_get_n_service: BuyNGetNService,
+    buy_n_get_n_service: BuyNGetNService,
 ) -> None:
     pytest.raises(BuyNGetNNotFound, buy_n_get_n_service.get_buy_n_get_n, "1")
 
@@ -88,13 +92,13 @@ def test_should_remove_buy_n_get_n(buy_n_get_n_service: BuyNGetNService) -> None
 
 
 def test_should_not_remove_non_existent_buy_n_get_n(
-        buy_n_get_n_service: BuyNGetNService,
+    buy_n_get_n_service: BuyNGetNService,
 ) -> None:
     pytest.raises(BuyNGetNNotFound, buy_n_get_n_service.remove_buy_n_get_n, "1")
 
 
 def test_should_not_add_buy_n_get_n_with_invalid_get_product_id(
-        buy_n_get_n_service: BuyNGetNService,
+    buy_n_get_n_service: BuyNGetNService,
 ) -> None:
     buy_n_get_n_service.product_store.add(ProductRecord("1", "product 1", 1.0))
     buy_n_get_n = BuyNGetN(
@@ -108,7 +112,7 @@ def test_should_not_add_buy_n_get_n_with_invalid_get_product_id(
 
 
 def test_should_not_add_buy_n_get_n_with_invalid_buy_product_id(
-        buy_n_get_n_service: BuyNGetNService,
+    buy_n_get_n_service: BuyNGetNService,
 ) -> None:
     buy_n_get_n_service.product_store.add(ProductRecord("1", "product 1", 1.0))
     buy_n_get_n = BuyNGetN(

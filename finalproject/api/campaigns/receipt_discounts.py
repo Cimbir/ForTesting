@@ -5,16 +5,18 @@ from fastapi.requests import Request
 from pydantic import BaseModel
 
 from finalproject.models.campaigns import ReceiptDiscount
-from finalproject.service.exceptions import ReceiptDiscountNotFound
 from finalproject.service.campaigns.receipt_discounts import ReceiptDiscountService
+from finalproject.service.exceptions import ReceiptDiscountNotFound
 from finalproject.store.receipt_discount import ReceiptDiscountStore
 
 receipt_discount_api = APIRouter()
 
+
 class _Distributor(Protocol):
     def receipt_discounts(self) -> ReceiptDiscountStore:
         pass
-    
+
+
 class ReceiptDiscountRequest(BaseModel):
     minimum_total: float
     discount: float
@@ -26,14 +28,14 @@ class SingleReceiptDiscountResponse(BaseModel):
 
 class ListReceiptDiscountsResponse(BaseModel):
     receipt_discounts: list[ReceiptDiscount]
-    
-def get_receipt_discount_service(
-        request: Request
-) -> ReceiptDiscountService:
+
+
+def get_receipt_discount_service(request: Request) -> ReceiptDiscountService:
     distributor: _Distributor = request.app.state.distributor
     return ReceiptDiscountService(
         distributor.receipt_discounts(),
     )
+
 
 @receipt_discount_api.post(
     "/",
@@ -42,7 +44,9 @@ def get_receipt_discount_service(
 )
 def add_receipt_discount(
     receipt_discount_request: ReceiptDiscountRequest,
-    receipt_discount_service: ReceiptDiscountService = Depends(get_receipt_discount_service),
+    receipt_discount_service: ReceiptDiscountService = Depends(
+        get_receipt_discount_service
+    ),
 ) -> SingleReceiptDiscountResponse:
     receipt_discount = ReceiptDiscount(
         id="",
@@ -60,10 +64,14 @@ def add_receipt_discount(
 )
 def get_receipt_discount(
     receipt_discount_id: str,
-    receipt_discount_service: ReceiptDiscountService = Depends(get_receipt_discount_service),
+    receipt_discount_service: ReceiptDiscountService = Depends(
+        get_receipt_discount_service
+    ),
 ) -> SingleReceiptDiscountResponse:
     try:
-        receipt_discount = receipt_discount_service.get_receipt_discount(receipt_discount_id)
+        receipt_discount = receipt_discount_service.get_receipt_discount(
+            receipt_discount_id
+        )
         return SingleReceiptDiscountResponse(receipt_discount=receipt_discount)
     except ReceiptDiscountNotFound:
         raise HTTPException(status_code=404, detail="Receipt discount not found")
@@ -76,7 +84,9 @@ def get_receipt_discount(
 )
 def remove_receipt_discount(
     receipt_discount_id: str,
-    receipt_discount_service: ReceiptDiscountService = Depends(get_receipt_discount_service),
+    receipt_discount_service: ReceiptDiscountService = Depends(
+        get_receipt_discount_service
+    ),
 ) -> None:
     try:
         receipt_discount_service.remove_receipt_discount(receipt_discount_id)
@@ -90,7 +100,9 @@ def remove_receipt_discount(
     response_model=ListReceiptDiscountsResponse,
 )
 def list_receipt_discounts(
-    receipt_discount_service: ReceiptDiscountService = Depends(get_receipt_discount_service),
+    receipt_discount_service: ReceiptDiscountService = Depends(
+        get_receipt_discount_service
+    ),
 ) -> ListReceiptDiscountsResponse:
     receipt_discounts = receipt_discount_service.get_all_receipt_discounts()
     return ListReceiptDiscountsResponse(receipt_discounts=receipt_discounts)

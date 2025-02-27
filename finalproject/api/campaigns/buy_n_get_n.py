@@ -12,13 +12,15 @@ from finalproject.store.product import ProductStore
 
 buy_n_get_n_api = APIRouter()
 
+
 class _Distributor(Protocol):
     def products(self) -> ProductStore:
         pass
 
     def buy_n_get_n(self) -> BuyNGetNStore:
         pass
-    
+
+
 class BuyNGetNRequest(BaseModel):
     buy_product_id: str
     buy_product_n: int
@@ -32,15 +34,15 @@ class SingleBuyNGetNResponse(BaseModel):
 
 class ListBuyNGetNsResponse(BaseModel):
     buy_n_get_ns: list[BuyNGetN]
-    
-def get_buy_n_get_n_service(
-        request: Request
-) -> BuyNGetNService:
+
+
+def get_buy_n_get_n_service(request: Request) -> BuyNGetNService:
     distributor: _Distributor = request.app.state.distributor
     return BuyNGetNService(
         distributor.products(),
         distributor.buy_n_get_n(),
     )
+
 
 @buy_n_get_n_api.post(
     "/",

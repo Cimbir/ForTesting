@@ -9,8 +9,8 @@ from starlette.testclient import TestClient
 from finalproject.api.campaigns.buy_n_get_n import buy_n_get_n_api
 from finalproject.api.campaigns.combos import combos_api
 from finalproject.api.campaigns.product_discounts import product_discounts_api
-from finalproject.api.products import products_api
 from finalproject.api.campaigns.receipt_discounts import receipt_discount_api
+from finalproject.api.products import products_api
 
 
 class API(Protocol):
@@ -32,7 +32,9 @@ class APIUsingFastAPI:
             products_api, prefix="/products", tags=["Products"]
         )
         self._fast_api.include_router(
-            product_discounts_api, prefix="/product_discounts", tags=["ProductDiscounts"]
+            product_discounts_api,
+            prefix="/product_discounts",
+            tags=["ProductDiscounts"],
         )
         self._fast_api.include_router(
             receipt_discount_api, prefix="/receipt_discounts", tags=["ReceiptDiscounts"]
@@ -40,9 +42,7 @@ class APIUsingFastAPI:
         self._fast_api.include_router(
             buy_n_get_n_api, prefix="/buy_n_get_n", tags=["BuyNGetN"]
         )
-        self._fast_api.include_router(
-            combos_api, prefix="/combos", tags=["Combos"]
-        )
+        self._fast_api.include_router(combos_api, prefix="/combos", tags=["Combos"])
 
     def run(self) -> None:
         self._run_strategy.run(self._fast_api)
