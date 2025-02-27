@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from finalproject.models.campaigns import ProductDiscount
 from finalproject.service.exceptions import ProductDiscountNotFound
-from finalproject.service.product_discounts import ProductDiscountService
+from finalproject.service.campaigns.product_discounts import ProductDiscountService
 from finalproject.store.product import ProductStore
 from finalproject.store.product_discount import ProductDiscountStore
 

@@ -5,7 +5,7 @@ from fastapi.requests import Request
 from pydantic import BaseModel
 
 from finalproject.models.campaigns import BuyNGetN
-from finalproject.service.buy_n_get_n import BuyNGetNService
+from finalproject.service.campaigns.buy_n_get_n import BuyNGetNService
 from finalproject.service.exceptions import BuyNGetNNotFound
 from finalproject.store.buy_n_get_n import BuyNGetNStore
 from finalproject.store.product import ProductStore

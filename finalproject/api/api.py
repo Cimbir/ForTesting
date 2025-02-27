@@ -6,11 +6,11 @@ from apexdevkit.server import UvicornServer
 from fastapi import FastAPI
 from starlette.testclient import TestClient
 
-from finalproject.api.buy_n_get_n import buy_n_get_n_api
-from finalproject.api.combos import combos_api
-from finalproject.api.product_discounts import product_discounts_api
+from finalproject.api.campaigns.buy_n_get_n import buy_n_get_n_api
+from finalproject.api.campaigns.combos import combos_api
+from finalproject.api.campaigns.product_discounts import product_discounts_api
 from finalproject.api.products import products_api
-from finalproject.api.receipt_discounts import receipt_discount_api
+from finalproject.api.campaigns.receipt_discounts import receipt_discount_api
 
 
 class API(Protocol):

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from finalproject.models.campaigns import ReceiptDiscount
 from finalproject.service.exceptions import ReceiptDiscountNotFound
-from finalproject.service.receipt_discounts import ReceiptDiscountService
+from finalproject.service.campaigns.receipt_discounts import ReceiptDiscountService
 from finalproject.store.receipt_discount import ReceiptDiscountStore
 
 receipt_discount_api = APIRouter()

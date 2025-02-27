@@ -5,7 +5,7 @@ from fastapi.requests import Request
 from pydantic import BaseModel
 
 from finalproject.models.campaigns import ComboItem, Combo
-from finalproject.service.combos import ComboService
+from finalproject.service.campaigns.combos import ComboService
 from finalproject.service.exceptions import ComboNotFound
 from finalproject.store.combo import ComboStore
 from finalproject.store.combo_item import ComboItemStore
