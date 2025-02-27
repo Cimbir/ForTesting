@@ -9,7 +9,6 @@ def test_should_not_add_anything(def_rec_close: ReceiptClose) -> None:
     bngn = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=1,
             get_product_id="1",
@@ -29,7 +28,6 @@ def test_should_add_free_product(def_rec_close: ReceiptClose) -> None:
     bngn = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=1,
             get_product_id="2",
@@ -37,7 +35,7 @@ def test_should_add_free_product(def_rec_close: ReceiptClose) -> None:
         ),
     )
 
-    receipt = get_receipt([ReceiptItem(id="1", product_id="1", quantity=1, price=1.0)])
+    receipt = get_receipt([ReceiptItem(product_id="1", quantity=1, price=1.0)])
 
     result = bngn.close(receipt)
 
@@ -49,7 +47,6 @@ def test_should_not_add_free_product(def_rec_close: ReceiptClose) -> None:
     bngn = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=2,
             get_product_id="2",
@@ -57,7 +54,7 @@ def test_should_not_add_free_product(def_rec_close: ReceiptClose) -> None:
         ),
     )
 
-    receipt = get_receipt([ReceiptItem(id="1", product_id="1", quantity=1, price=1.0)])
+    receipt = get_receipt([ReceiptItem(product_id="1", quantity=1, price=1.0)])
 
     result = bngn.close(receipt)
 
@@ -71,7 +68,6 @@ def test_should_add_free_items_with_other_items(
     bngn = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=2,
             get_product_id="2",
@@ -81,8 +77,8 @@ def test_should_add_free_items_with_other_items(
 
     receipt = get_receipt(
         [
-            ReceiptItem(id="1", product_id="1", quantity=3, price=3.0),
-            ReceiptItem(id="2", product_id="3", quantity=2, price=2.0),
+            ReceiptItem(product_id="1", quantity=3, price=3.0),
+            ReceiptItem(product_id="3", quantity=2, price=2.0),
         ]
     )
 
@@ -98,7 +94,6 @@ def test_should_add_free_product_multiple_times(
     bngn = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=2,
             get_product_id="2",
@@ -106,7 +101,7 @@ def test_should_add_free_product_multiple_times(
         ),
     )
 
-    receipt = get_receipt([ReceiptItem(id="1", product_id="1", quantity=5, price=5.0)])
+    receipt = get_receipt([ReceiptItem(product_id="1", quantity=5, price=5.0)])
 
     result = bngn.close(receipt)
 
@@ -118,7 +113,6 @@ def test_should_get_only_one_free_product(def_rec_close: ReceiptClose) -> None:
     bngn = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=4,
             get_product_id="2",
@@ -128,7 +122,6 @@ def test_should_get_only_one_free_product(def_rec_close: ReceiptClose) -> None:
     bngn = BuyNGetNDecorator(
         bngn,
         BuyNGetN(
-            id="2",
             buy_product_id="1",
             buy_product_n=2,
             get_product_id="2",
@@ -138,8 +131,8 @@ def test_should_get_only_one_free_product(def_rec_close: ReceiptClose) -> None:
 
     receipt = get_receipt(
         [
-            ReceiptItem(id="1", product_id="1", quantity=3, price=3.0),
-            ReceiptItem(id="2", product_id="3", quantity=2, price=2.0),
+            ReceiptItem(product_id="1", quantity=3, price=3.0),
+            ReceiptItem(product_id="3", quantity=2, price=2.0),
         ]
     )
 
@@ -155,7 +148,6 @@ def test_should_get_multiple_free_products_from_multiple_sources(
     bngn = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=4,
             get_product_id="2",
@@ -165,7 +157,6 @@ def test_should_get_multiple_free_products_from_multiple_sources(
     bngn = BuyNGetNDecorator(
         bngn,
         BuyNGetN(
-            id="2",
             buy_product_id="1",
             buy_product_n=2,
             get_product_id="2",
@@ -175,8 +166,8 @@ def test_should_get_multiple_free_products_from_multiple_sources(
 
     receipt = get_receipt(
         [
-            ReceiptItem(id="1", product_id="1", quantity=4, price=3.0),
-            ReceiptItem(id="2", product_id="2", quantity=2, price=2.0),
+            ReceiptItem(product_id="1", quantity=4, price=3.0),
+            ReceiptItem(product_id="2", quantity=2, price=2.0),
         ]
     )
 
@@ -190,7 +181,6 @@ def test_should_get_different_free_products(def_rec_close: ReceiptClose) -> None
     bngn = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=2,
             get_product_id="2",
@@ -200,7 +190,6 @@ def test_should_get_different_free_products(def_rec_close: ReceiptClose) -> None
     bngn = BuyNGetNDecorator(
         bngn,
         BuyNGetN(
-            id="2",
             buy_product_id="1",
             buy_product_n=2,
             get_product_id="3",
@@ -208,7 +197,7 @@ def test_should_get_different_free_products(def_rec_close: ReceiptClose) -> None
         ),
     )
 
-    receipt = get_receipt([ReceiptItem(id="1", product_id="1", quantity=2, price=4.0)])
+    receipt = get_receipt([ReceiptItem(product_id="1", quantity=2, price=4.0)])
 
     result = bngn.close(receipt)
 
@@ -218,7 +207,7 @@ def test_should_get_different_free_products(def_rec_close: ReceiptClose) -> None
 
 
 def test_got_items_have_no_effect_on_price(def_rec_close: ReceiptClose) -> None:
-    receipt = get_receipt([ReceiptItem(id="1", product_id="1", quantity=1, price=1.0)])
+    receipt = get_receipt([ReceiptItem(product_id="1", quantity=1, price=1.0)])
 
     result = def_rec_close.close(receipt)
 
@@ -228,7 +217,6 @@ def test_got_items_have_no_effect_on_price(def_rec_close: ReceiptClose) -> None:
     def_rec_close = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=1,
             get_product_id="1",

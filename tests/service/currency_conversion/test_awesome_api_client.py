@@ -2,12 +2,12 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from finalproject.service.awesome_api_client import (
+from finalproject.service.currency_conversion.awesome_api_client import (
     AWESOME_API_GET_EXCHANGE_RATE_PATH_FORMAT,
     AwesomeAPIRequestFailed,
     DefaultAwesomeAPIClient,
 )
-from finalproject.service.http_client import HttpxAPIClient
+from finalproject.service.currency_conversion.http_client import HttpxAPIClient
 
 
 @patch("httpx.get")

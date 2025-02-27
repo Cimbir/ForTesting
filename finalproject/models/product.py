@@ -6,9 +6,9 @@ from finalproject.store.product import ProductRecord
 
 @dataclass
 class Product(Model):
-    id: str
-    name: str
-    price: float
+    id: str = ""
+    name: str = ""
+    price: float = 0.0
 
     def to_record(self) -> ProductRecord:
         return ProductRecord(

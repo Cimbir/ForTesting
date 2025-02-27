@@ -20,18 +20,15 @@ from tests.service.receipt_close.utils import get_receipt
 
 def test_should_return_empty_result(def_rec_close: ReceiptClose) -> None:
     def_rec_close = ProductDiscountDecorator(
-        def_rec_close, ProductDiscount(id="1", product_id="1", discount=0.1)
+        def_rec_close, ProductDiscount(product_id="1", discount=0.1)
     )
     def_rec_close = ReceiptDiscountDecorator(
-        def_rec_close, ReceiptDiscount(id="1", discount=0.1, minimum_total=100)
+        def_rec_close, ReceiptDiscount(discount=0.1, minimum_total=100)
     )
-    def_rec_close = ComboDecorator(
-        def_rec_close, Combo(id="1", discount=0.1, name="test", items=[])
-    )
+    def_rec_close = ComboDecorator(def_rec_close, Combo(discount=0.1))
     def_rec_close = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=1,
             get_product_id="1",
@@ -49,17 +46,17 @@ def test_should_discount_with_product_and_receipt(
     def_rec_close: ReceiptClose,
 ) -> None:
     def_rec_close = ReceiptDiscountDecorator(
-        def_rec_close, ReceiptDiscount(id="1", discount=0.1, minimum_total=100)
+        def_rec_close, ReceiptDiscount(discount=0.1, minimum_total=100)
     )
     def_rec_close = ProductDiscountDecorator(
-        def_rec_close, ProductDiscount(id="1", product_id="1", discount=0.1)
+        def_rec_close, ProductDiscount(product_id="1", discount=0.1)
     )
 
     result = def_rec_close.close(
         get_receipt(
             [
-                ReceiptItem(id="1", product_id="1", quantity=20, price=10.0),
-                ReceiptItem(id="2", product_id="2", quantity=1, price=10.0),
+                ReceiptItem(product_id="1", quantity=20, price=10.0),
+                ReceiptItem(product_id="2", quantity=1, price=10.0),
             ]
         )
     )
@@ -73,9 +70,7 @@ def test_should_discount_combo_part_with_products(
     def_rec_close = ComboDecorator(
         def_rec_close,
         Combo(
-            id="1",
             discount=0.1,
-            name="test",
             items=[
                 ComboItem(id="1", product_id="1", quantity=1),
                 ComboItem(id="2", product_id="2", quantity=2),
@@ -83,15 +78,15 @@ def test_should_discount_combo_part_with_products(
         ),
     )
     def_rec_close = ProductDiscountDecorator(
-        def_rec_close, ProductDiscount(id="1", product_id="1", discount=0.1)
+        def_rec_close, ProductDiscount(product_id="1", discount=0.1)
     )
 
     result = def_rec_close.close(
         get_receipt(
             [
-                ReceiptItem(id="1", product_id="1", quantity=3, price=7.0),
-                ReceiptItem(id="2", product_id="2", quantity=4, price=8.0),
-                ReceiptItem(id="3", product_id="3", quantity=1, price=10.0),
+                ReceiptItem(product_id="1", quantity=3, price=7.0),
+                ReceiptItem(product_id="2", quantity=4, price=8.0),
+                ReceiptItem(product_id="3", quantity=1, price=10.0),
             ]
         )
     )
@@ -103,13 +98,13 @@ def test_should_not_change_price_with_added_items(
     def_rec_close: ReceiptClose,
 ) -> None:
     def_rec_close = ProductDiscountDecorator(
-        def_rec_close, ProductDiscount(id="1", product_id="1", discount=0.1)
+        def_rec_close, ProductDiscount(product_id="1", discount=0.1)
     )
 
     receipt = get_receipt(
         [
-            ReceiptItem(id="1", product_id="1", quantity=10, price=10.0),
-            ReceiptItem(id="2", product_id="2", quantity=1, price=10.0),
+            ReceiptItem(product_id="1", quantity=10, price=10.0),
+            ReceiptItem(product_id="2", quantity=1, price=10.0),
         ]
     )
 
@@ -121,7 +116,6 @@ def test_should_not_change_price_with_added_items(
     def_rec_close = BuyNGetNDecorator(
         def_rec_close,
         BuyNGetN(
-            id="1",
             buy_product_id="1",
             buy_product_n=1,
             get_product_id="1",

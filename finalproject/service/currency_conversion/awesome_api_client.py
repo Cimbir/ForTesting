@@ -3,7 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from finalproject.service.http_client import HttpAPIClient, HttpAPIResponse
+from finalproject.service.currency_conversion.http_client import (
+    HttpAPIClient,
+    HttpAPIResponse,
+)
 
 AWESOME_API_DEFAULT_ENDPOINT = "https://economia.awesomeapi.com.br"
 AWESOME_API_CURRENCY_KEY_FORMAT = "{currency_from}{currency_to}"

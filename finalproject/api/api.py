@@ -11,6 +11,7 @@ from finalproject.api.campaigns.combos import combos_api
 from finalproject.api.campaigns.product_discounts import product_discounts_api
 from finalproject.api.campaigns.receipt_discounts import receipt_discount_api
 from finalproject.api.products import products_api
+from finalproject.api.receipts import receipts_api
 
 
 class API(Protocol):
@@ -30,6 +31,9 @@ class APIUsingFastAPI:
     def _register_routes(self) -> None:
         self._fast_api.include_router(
             products_api, prefix="/products", tags=["Products"]
+        )
+        self._fast_api.include_router(
+            receipts_api, prefix="/receipts", tags=["Receipts"]
         )
         self._fast_api.include_router(
             product_discounts_api,
